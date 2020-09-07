@@ -28,20 +28,20 @@ It's recommended that you create a folder you in your project called `/api` that
 
 ## Create the ApiLayer
 Create a global ApiLayer that you will import into your other API functions.  For example, create `/api/apiLayer.js` with the following sample contents 
-```
+```javascript
 import { apiLayerCreate } from 'api-layer';
 export default apiLayerCreate();
 ```
 
 ## Create your API function
 Create a sample API function called `/api/getSample.js`.
-```
+```javascript
 import { createGetApi } from 'api-layer';
 import apiLayer from './apiLayer';
 
 function getSample() {
   // This sample uses fetch to make a REST API call
-  return fetch('https://api.github.com/emojis)
+  return fetch('https://api.github.com/emojis')
     .then(response => response.json());
 }
 
@@ -58,7 +58,7 @@ export default createGetApi(apiLayer, getSample, getSampleMock);
 
 ## Call your new API function
 You can now call your abstract function instead of directly fetching the resource from the URL.  
-```
+```javascript
 import getSample from '/api/getSample';
 
 getSample()
@@ -69,7 +69,7 @@ getSample()
 
 ## Test your API function in Jest
 Its simple to test your functions because you can put the whole ApiLayer into `mock` mode.  Since all your API functions are required to have mock results for testing, you can be assured that you can easily test your higher level code with the sample response.
-```
+```javascript
 import getSample from '/api/getSample';
 import apiLayer from '/api/apiLayer';
 
@@ -85,7 +85,7 @@ test('Test my getSample function', async () => {
 ```
 
 You can also override the APIs to return a different result for testing purposes
-```
+```javascript
 import { overrideApi } from 'api-layer';
 import getSample from '/api/getSample';
 import apiLayer from '/api/apiLayer';
@@ -108,13 +108,13 @@ test('Test error handling in my code', () => {
 
 ## Update your API without changing your Front-end code
 Your back-end team decided to move the API end-point for emojis to a new location.  That's no problem.  They can now go into the front-end code and find any occurrence in your `api` folder and update it without having to notify the front-end team.  They update `/api/getSample` to:
-```
+```javascript
 import { createGetApi } from 'api-layer';
 import apiLayer from './apiLayer';
 
 function getSample() {
   // Call the new v2 api and modify the result to match the original getSample interface
-  return fetch('https://api.github.com/v2/emojis)
+  return fetch('https://api.github.com/v2/emojis')
     .then(response => response.json())
     .then((json) => {
       // Now our json looks like { emojis, images }, so we update the response back
@@ -138,6 +138,6 @@ A number of sample implementations have been provided so you can understand how 
 1. General and Recommend Usage
 2. Unit testing
 3. Overriding Apis
-4. Creating a cache layer
+4. Creating a cached API layer
 5. Validating api responses
 
