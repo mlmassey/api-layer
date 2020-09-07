@@ -1,7 +1,7 @@
 {
   "name": "api-layer",
   "version": "0.1.0",
-  "description": "Asynchronous API layer library",
+  "description": "Asynchronous API management library",
   "main": "lib/index.ts",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -15,8 +15,21 @@
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags"
   },
-  "keywords": [],
-  "author": "Matt Massey",
+  "keywords": [
+    "api",
+    "layer",
+    "api-layer",
+    "asynchronous"
+  ],
+  "author": "Matt Massey <mattlmassey@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mlmassey/api-layer"
+  },
+  "bugs": {
+    "url": "https://github.com/mlmassey/api-layer/issues"
+  },
+  "homepage": "https://github.com/mlmassey/api-layer",
   "license": "MIT",
   "files": [
     "lib/**/*"
