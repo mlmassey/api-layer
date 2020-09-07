@@ -2,7 +2,8 @@
 import { ApiFunction } from 'types/ApiFunction';
 import { ApiType } from 'types/ApiType';
 
-const DEFAULT_MOCK_DELAY = 3000;
+// Set the default delay in milliseconds. Default is 0 for no delay
+const DEFAULT_MOCK_DELAY = 0;
 
 type ApiFunctionMap = Record<string, ApiFunction | undefined>;
 type ApiOverrideMap = Record<string, any>;
