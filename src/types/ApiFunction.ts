@@ -14,4 +14,6 @@ export interface ApiFunction {
   invalidates?: Array<ApiFunction>;
   /** Clears the cache for this api (if cached) */
   clear?: () => void;
+  /** The ApiLayer this is installed into */
+  apiLayer?: any;
 }

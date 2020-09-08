@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { apiGetUserById, User } from '../api/user';
 import { apiLayer } from '../api/apiLayer';
 import { createMockApi, overrideApi } from '../../src';
@@ -35,7 +36,7 @@ const mockCallback = createMockApi(undefined, undefined, sampleCallback);
 
 test('Using createMockApi and overrideApi', async () => {
   // Now we want to override the API to return a different result in our test case
-  const removeOverride = overrideApi(apiLayer, apiGetUserById, mockPositiveResult);
+  const removeOverride = overrideApi(apiGetUserById, mockPositiveResult);
   // Call our api function again to see if it is now returning the new override value
   const user = await apiGetUserById('1');
   expect(user.id).toBe('mock_user');
@@ -45,7 +46,7 @@ test('Using createMockApi and overrideApi', async () => {
 
 test('Negative test case', () => {
   // Now we want to override the API to return a different result in our test case
-  overrideApi(apiLayer, apiGetUserById, mockNegativeResult);
+  overrideApi(apiGetUserById, mockNegativeResult);
   // Call our api function again to see if it is now returning the new override value
   return apiGetUserById('1').catch((error: string) => {
     expect(error).toBe('Error result');
@@ -54,7 +55,7 @@ test('Negative test case', () => {
 
 test('Using a callback function in your mock api', async () => {
   // Now we want to override the API to return a different result in our test case
-  overrideApi(apiLayer, apiGetUserById, mockCallback);
+  overrideApi(apiGetUserById, mockCallback);
   // Call our api function again to see if it is now returning the new override value
   const user = await apiGetUserById('1');
   expect(user.id).toBe('callback_user');
@@ -75,12 +76,12 @@ test('Removing a previous override does nothing', async () => {
     email: 'user2',
   };
   const override2 = createMockApi(user2);
-  const removeOverride1 = overrideApi(apiLayer, apiGetUserById, override1);
+  const removeOverride1 = overrideApi(apiGetUserById, override1);
   // We now expect our api to return the user1
   let user = await apiGetUserById('1');
   expect(user.id).toBe('user1');
   // Now lets install the second override
-  const removeOverride2 = overrideApi(apiLayer, apiGetUserById, override2);
+  const removeOverride2 = overrideApi(apiGetUserById, override2);
   user = await apiGetUserById('1');
   expect(user.id).toBe('user2');
   // Now, if we try to remove override1, it should do nothing, since it is no longer installed
@@ -103,7 +104,7 @@ test('Setting a delay on your mock apis', async () => {
   };
   // Lets create an override with a 1000 millisecond delay
   const override = createMockApi(user1, undefined, undefined, 1000);
-  overrideApi(apiLayer, apiGetUserById, override);
+  overrideApi(apiGetUserById, override);
   const start = Date.now();
   await apiGetUserById('1');
   const finish = Date.now();
