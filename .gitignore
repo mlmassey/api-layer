@@ -1,4 +1,2 @@
 node_modules
 /lib
-/cjs/**/*
-!/cjs/package.json

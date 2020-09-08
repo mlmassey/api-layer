@@ -3,13 +3,13 @@
   "version": "0.3.3",
   "description": "Asynchronous API management library",
   "type": "module",
-  "main": "./lib/index.js",
-  "module": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/esm/index.d.ts",
   "scripts": {
     "build": "yarn build:esm && yarn build:cjs",
-    "build:esm": "tsc -p tsconfig.json",
-    "build:cjs": "tsc -p tsconfig-cjs.json",
+    "build:esm": "tsc -p tsconfig.json && cp package.esm.json ./lib/esm/package.json",
+    "build:cjs": "tsc -p tsconfig-cjs.json && cp package.cjs.json ./lib/cjs/package.json",
     "test": "jest ./",
     "format": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
@@ -39,8 +39,7 @@
   "homepage": "https://github.com/mlmassey/api-layer",
   "license": "MIT",
   "files": [
-    "lib/",
-    "cjs/"
+    "lib/"
   ],
   "jest": {
     "modulePaths": [
