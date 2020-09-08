@@ -32,9 +32,17 @@ A number of sample implementations have been provided so you can understand how 
 # Typescript Types
 Typescript types can be directly imported from the library. There should be no need to install separate type definitions.
 
-# CommonJS Module
-This library is targeted to modern packaging using ESM modules.  If you are using older/node style imports with CommonJS, you will need to require teh cjs version when importing
+# CommonJS/ES Modules
+This library provides both ESM and CommonJS builds.  You should not need to worry about this, but in case you want to specifically use
+one or the other, you can do the following:
+
+## CommonJS
 ```javascript
-var ApiLibrary = require('api-library/cjs');
+var ApiLibrary = require('api-library/lib/cjs');
+```
+
+## ESM
+```javascript
+import { createGetApi } from 'api-library/lib/esm';  
 ```
 
