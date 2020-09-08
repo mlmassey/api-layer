@@ -2,7 +2,7 @@
 The ApiLayer does not directly implement client-side caching.  The file [sample.test.ts](./sample.test.ts) demonstrates how to use the 3rd party memoization library [memoizee](https://github.com/medikoo/memoizee) to memoize your API calls to provide caching.  ApiLayer supports caching if you do the following:
 
 ## Memoize your API functions
-When you write your actual API function, wrap it in a memoization.  It is recommended to have a cache age that matches how frequently your server side data changes.  
+When you write your actual API function, wrap it in memoization function.  It is recommended to have a cache age that matches how frequently your server side data changes.  
 ```javascript
 import * as memoize from 'memoizee';
 import { createGetApi, apiLayerCreate } from 'api-layer';
@@ -27,8 +27,8 @@ export default createGetApi(apiLayer, memoize(getSampleData, cacheOptions), memo
 ```
 
 ## Make your SET api invalidate related GET functions
-You need to tell your `SET` API function to invalidate any `GET` function that fetches the same data.  ApiLayer will take care of invalidating 
-these related APIs for you if you call your `SET` function.  You need to be careful to list all related `GET` apis in the invalidates parameter or you risk data becoming out of sync, since some functions are cached and some are not.
+You need to tell your `SET` API function to invalidate any `GET` function that fetch the same data.  ApiLayer will take care of invalidating 
+these related APIs for you when you call the `SET` function.  
 ```javascript
 import { createSetApi, apiLayerCreate } from 'api-layer';
 import apiGetSampleData from './apiGetSampleData'; // See function declared above
@@ -49,7 +49,7 @@ export default createSetApi(apiLayer, setSampleData, mockSetSampleData, [apiGetS
 ```
 
 ## Using a different memoization library
-There is no requirement to use memoizee for caching.  Feel free to use any library you want.  The only requirement is that the cached/memoized function needs to include a `clear()` function to signal that it is cached and should be cleared.  The functions created by `createGetApi` and `createSetApi` will always include a `clear()` function, but if the called functions have no `clear()` function defined, it will do nothing.
+There is no requirement to use [memoizee](https://github.com/medikoo/memoizee) for caching.  Feel free to use any library you want.  The only requirement is that the cached/memoized function needs to include a `clear()` member function to signal that it is cached.  The functions created by `createGetApi` and `createSetApi` will always include a `clear()` function, but if your functions have no `clear()` function member defined, it will do nothing.
 ```javascript
 const myGetApi = (): Promise<string> => {
   return Promise.resolve('hello');

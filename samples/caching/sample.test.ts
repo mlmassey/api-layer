@@ -28,15 +28,14 @@ function setApi(value: string): Promise<string> {
 // When creating your memoized functions, its best to think about how often the data that is being fetched from your
 // server changes and set a cache timeout.  For instance, if our data changes every hour, we should set the cache
 // timeout to an hour to make sure we get fresh data occasionally.
-// NOTE: maxAge was disabled because
 const cacheOptions = {
   maxAge: 1000 * 60 * 60, // Set our max age to 1 hour
 };
 const memoizedGet = memoize(getApi, cacheOptions);
 
-// Create our api-layer functions, but wrap our actual API calls with memoized functions
-// The memoized functions attach an additional function to our API function called clear() that is used to clear the cache
-// if necessary.  If your memoization library does not add a clear() function, you will have to add it yourself manually
+// Create our api-layer functions, but wrap our actual API calls with memoize
+// The memoized functions attach an additional function to our API function called clear() that is used to clear the cache.
+// If your memoization library does not add a clear() function, you will have to add it yourself manually
 const apiSampleGet = createGetApi(apiLayer, memoizedGet, memoizedGet);
 // Create our set api function and make sure to tell it that it will invalidate our get API if it is called using the invalidates argument
 const apiSampleSet = createSetApi(apiLayer, setApi, setApi, [apiSampleGet]);
