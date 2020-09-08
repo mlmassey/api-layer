@@ -2,7 +2,7 @@
   "name": "api-layer",
   "version": "0.2.1",
   "description": "Asynchronous API management library",
-  "main": "lib/index.ts",
+  "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
