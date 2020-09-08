@@ -1,6 +1,6 @@
 {
   "name": "api-layer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Asynchronous API management library",
   "main": "lib/index.ts",
   "types": "lib/index.d.ts",
