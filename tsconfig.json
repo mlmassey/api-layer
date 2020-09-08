@@ -5,7 +5,8 @@
     "declaration": true,
     "outDir": "./lib",
     "strict": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "esModuleInterop": true,
   },
   "include": ["src"],
   "exclude": ["node_modules", "lib", "cjs", "**/*.test.ts", "**/__tests__/*"]
