@@ -1,5 +1,6 @@
 import { ApiType } from './types/ApiType';
-import { apiLayerInstall, ApiLayer } from './ApiLayer';
+import { apiLayerInstall } from './ApiLayerCommon';
+import { ApiLayer } from './types/ApiLayer';
 
 /**
  * Creates a new GET API function that wraps your provided API function to allow it be overridden.  This should be only

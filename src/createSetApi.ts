@@ -1,6 +1,7 @@
 import { ApiType } from './types/ApiType';
-import { apiLayerInstall, ApiLayer } from './ApiLayer';
+import { apiLayerInstall } from './ApiLayerCommon';
 import { ApiFunction } from './types/ApiFunction';
+import { ApiLayer } from './types/ApiLayer';
 
 /**
  * Creates a new SET API function that wraps your provided API function to allow it be overridden.  This should be

@@ -1,13 +1,12 @@
 import {
   apiLayerCreate,
   apiLayerGetApi,
-  ApiLayer,
-  ApiLayerOptions,
   isApiLayerFunction,
   apiLayerClearCache,
   apiLayerMockMode,
   apiLayerSetOptions,
-} from './ApiLayer';
+} from './ApiLayerCommon';
+import { ApiLayer, ApiLayerOptions } from './types/ApiLayer';
 import { createGetApi } from './createGetApi';
 import { createSetApi } from './createSetApi';
 import { createMockApi } from './createMockApi';

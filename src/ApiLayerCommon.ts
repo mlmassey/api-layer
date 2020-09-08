@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { ApiLayerOptions, ApiLayer } from './types/ApiLayer';
 import { ApiFunction } from './types/ApiFunction';
 import { ApiType } from './types/ApiType';
 
@@ -9,26 +10,6 @@ const API_LAYER_PREFIX = 'api';
 // Global counters for creating unique ids
 let _layerCreateCount = 0;
 let _installCount = 0;
-
-type ApiFunctionMap = Record<string, ApiFunction | undefined>;
-type ApiOverrideMap = Record<string, any>;
-
-/**
- * Options when creating an ApiLayer
- */
-export interface ApiLayerOptions {
-  /** If set to true, the ApiLayer is created in test/mock mode and only mock functions will be called */
-  mockMode?: boolean;
-  /** Global delay (in milliseconds) to introduce to all your mock calls.  This is ignored if your API specifies its own delay.  Default is 0, which is no delay */
-  mockDelay?: number;
-}
-
-export interface ApiLayer {
-  layerId: string;
-  installed: ApiFunctionMap;
-  overrides: ApiOverrideMap;
-  options: ApiLayerOptions;
-}
 
 const DEFAULT_OPTIONS: ApiLayerOptions = {
   mockMode: false,

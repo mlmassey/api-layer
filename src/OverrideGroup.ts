@@ -1,4 +1,4 @@
-import { isApiLayerFunction } from './ApiLayer';
+import { isApiLayerFunction } from './ApiLayerCommon';
 import { ApiFunction } from './types/ApiFunction';
 import { overrideApi } from './overrideApi';
 

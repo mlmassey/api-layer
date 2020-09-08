@@ -1,4 +1,4 @@
-import { apiLayerOverride, apiLayerRemoveOverride } from './ApiLayer';
+import { apiLayerOverride, apiLayerRemoveOverride } from './ApiLayerCommon';
 import { ApiFunction } from './types/ApiFunction';
 
 /**
