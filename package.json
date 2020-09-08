@@ -1,6 +1,6 @@
 {
   "name": "api-layer",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Asynchronous API management library",
   "type": "module",
   "main": "./lib/esm/index.js",
