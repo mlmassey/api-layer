@@ -1,5 +1,6 @@
+/* eslint-disable import/default */
 /* eslint-disable import/no-extraneous-dependencies */
-import * as memoize from 'memoizee';
+import memoize from 'memoizee';
 import { apiLayerCreate, createGetApi, createSetApi, overrideApi } from '../../src';
 
 // Create a global variable that will store our testing value

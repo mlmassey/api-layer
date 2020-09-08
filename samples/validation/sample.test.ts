@@ -1,5 +1,6 @@
+/* eslint-disable import/default */
 /* eslint-disable import/no-extraneous-dependencies */
-import * as Ajv from 'ajv';
+import Ajv from 'ajv';
 import { apiLayerCreate, createGetApi } from '../../src';
 
 const ajv = new Ajv();
