@@ -1,5 +1,5 @@
 # api-layer
-api-layer is a very simple API management library that helps you clearly define an abstraction layer for your API calls to ensure that they are easily mockable or overridden.  It has no dependencies and fully supports Typescript and Javascript.  
+api-layer is a very simple API management library that helps you clearly define an abstraction layer for your API calls to ensure that they are easily mockable or overridden.  You can also easily add a client-side API caching to greatly improve your apps performance.  It has no dependencies and fully supports Typescript and Javascript.  
 
 # Installation
 Using npm:
@@ -10,6 +10,9 @@ Using yarn:
 ```
 $ yarn add api-layer
 ```
+
+# Typescript Types
+Typescript types can be directly imported from the library. There should be no need to install separate type definitions.
 
 # Justification
 Working on many large projects, most teams are split into back-end and front-end development teams.  Typically, the two teams agree on RESTful API definitions and directly call the APIs using libraries such as `fetch` or `Axios`.  Over time though, APIs may change parameters or add functionality, so someone has to update each API call in the front-end code to handle the new API signature.  Additionally, during initial development, the front-end code will fail until the actual server/API call is available, so front-end developers will typically stub or mock the API until it is actually ready.  The api-layer library was created to formalize this process and create a clearly defined abstraction layer for handling API calls, so your application always handles APIs in a standardized methodology that allows for easy mocking and testing.  You can also add front-end API caching easily and simply using any 3rd party memoization function of your choosing.

@@ -13,7 +13,7 @@ export const overrideApi = <T extends Array<any>, U extends Promise<any>>(
   overrideFunction: (...args: T) => U,
 ) => {
   apiLayerOverride(apiToOverride, overrideFunction);
-  return (): void => {
+  return () => {
     apiLayerRemoveOverride(apiToOverride, overrideFunction);
   };
 };

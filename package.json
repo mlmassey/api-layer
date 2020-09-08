@@ -19,7 +19,10 @@
     "api",
     "layer",
     "api-layer",
-    "asynchronous"
+    "asynchronous",
+    "cache",
+    "caching",
+    "client-side cache"
   ],
   "author": "Matt Massey <mattlmassey@gmail.com>",
   "repository": {

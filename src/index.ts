@@ -14,6 +14,7 @@ import { createMockApi } from 'createMockApi';
 import { overrideApi } from 'overrideApi';
 import { ApiFunction } from 'types/ApiFunction';
 import { ApiType } from 'types/ApiType';
+import { OverrideGroup } from './OverrideGroup';
 
 export {
   apiLayerCreate,
@@ -26,6 +27,7 @@ export {
   apiLayerSetOptions,
   createSetApi,
   createMockApi,
+  OverrideGroup,
   ApiLayer,
   ApiLayerOptions,
   ApiFunction,

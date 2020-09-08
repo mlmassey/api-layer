@@ -95,7 +95,7 @@ export const apiLayerGetApi = (apiLayer: ApiLayer, apiName: string): ApiFunction
 const callMock = <T extends Array<any>, U extends Promise<any>>(
   apiLayer: ApiLayer,
   apiName: string,
-  mockFunction: (...args: T) => Promise<U>,
+  mockFunction: (...args: T) => U,
   ...args: T
 ) => {
   const api = apiLayerGetApi(apiLayer, apiName);
@@ -143,7 +143,7 @@ const callMock = <T extends Array<any>, U extends Promise<any>>(
 const callApi = <T extends Array<any>, U extends Promise<any>>(
   apiLayer: ApiLayer,
   apiName: string,
-  apiFunction: (...args: T) => Promise<U>,
+  apiFunction: (...args: T) => U,
   ...args: T
 ) => {
   const api = apiLayerGetApi(apiLayer, apiName);
@@ -182,7 +182,7 @@ const callApi = <T extends Array<any>, U extends Promise<any>>(
  */
 export const apiLayerOverride = <T extends Array<any>, U extends Promise<any>>(
   apiToOverride: ApiFunction,
-  overrideFunction: (...args: T) => Promise<U>,
+  overrideFunction: (...args: T) => U,
 ): void => {
   if (!apiToOverride || !isApiLayerFunction(apiToOverride)) {
     throw new Error('Invalid arguments');
@@ -243,8 +243,8 @@ const getUniqueApiName = (apiLayer: ApiLayer, name: string): string => {
 export const apiLayerInstall = <T extends Array<any>, U extends Promise<any>>(
   apiLayer: ApiLayer,
   name: string,
-  api: (...args: T) => Promise<U>,
-  mock: (...args: T) => Promise<U>,
+  api: (...args: T) => U,
+  mock: (...args: T) => U,
   options: InstallApiOptions,
 ) => {
   checkApiLayer(apiLayer);
@@ -259,11 +259,11 @@ export const apiLayerInstall = <T extends Array<any>, U extends Promise<any>>(
   }
   // Create our new unique api name to ensure it is always unique
   const apiName = getUniqueApiName(apiLayer, name);
-  const mockLayerFunc = (...args: T): Promise<U> => {
-    return callMock(apiLayer, apiName, mock, ...args);
+  const mockLayerFunc = (...args: T): U => {
+    return callMock(apiLayer, apiName, mock, ...args) as U;
   };
-  const apiLayerFunc = (...args: T): Promise<U> => {
-    return callApi(apiLayer, apiName, api, ...args);
+  const apiLayerFunc = (...args: T): U => {
+    return callApi(apiLayer as ApiLayer, apiName, api, ...args);
   };
   // Add our special members to designate this as an api
   const additional = {
