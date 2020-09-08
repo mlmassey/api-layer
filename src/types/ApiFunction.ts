@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ApiType } from 'types/ApiType';
+import { ApiType } from './ApiType';
 
 export interface ApiFunction {
   /** Main api function */
