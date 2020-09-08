@@ -28,11 +28,11 @@ test('ApiLayer change mock delay', async () => {
   let finish = Date.now();
   expect(finish - start).toBeLessThan(1000);
   // Now change the delay to make sure it also changes
-  apiLayerMockMode(apiLayer, true, 2000);
+  apiLayerMockMode(apiLayer, true, 1000);
   start = Date.now();
   await getApi('hello again');
   finish = Date.now();
-  expect(finish - start).toBeGreaterThanOrEqual(2000);
+  expect(finish - start).toBeGreaterThanOrEqual(1000);
 });
 
 test('ApiLayer set mock mode on', async () => {

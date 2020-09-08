@@ -40,12 +40,12 @@ test('Setting api layer mock mode to on', async () => {
 
 test('Change mock delay increases delay of mock response', async () => {
   let original = 'test';
-  apiLayerMockMode(apiLayer, true, 2000, true);
+  apiLayerMockMode(apiLayer, true, 1000, true);
   const start = Date.now();
   original = await apiFunction(original);
   const finish = Date.now();
   expect(original).toBe('mock test sucks');
-  expect(finish - start).toBeGreaterThanOrEqual(2000);
+  expect(finish - start).toBeGreaterThanOrEqual(1000);
 });
 
 test('Not supplying a mock function throws error', () => {

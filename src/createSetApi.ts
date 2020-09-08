@@ -14,10 +14,10 @@ import { ApiFunction } from 'types/ApiFunction';
  * @param {string} apiName: (optional) Provide a name to identify this api with.  The resulting function has its apiName member set with this
  * @returns {ApiFunction} The API function you can call directly, just as you would the apiFunction parameter provided.
  */
-export const createSetApi = <T extends Array<any>, U extends Promise<any>>(
+export const createSetApi = <T extends Array<any>, U extends any>(
   apiLayer: ApiLayer,
-  apiFunction: (...args: T) => U,
-  mock: (...args: T) => U,
+  apiFunction: (...args: T) => Promise<U>,
+  mock: (...args: T) => Promise<U>,
   invalidates?: ApiFunction | Array<ApiFunction>,
   apiName?: string,
 ) => {

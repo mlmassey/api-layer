@@ -92,26 +92,34 @@ export const apiLayerGetApi = (apiLayer: ApiLayer, apiName: string): ApiFunction
   return apiLayer.installed[apiName];
 };
 
-const callMock = <T extends Array<any>, U extends Promise<any>>(
+const callMock = <T extends Array<any>, U extends any>(
   apiLayer: ApiLayer,
   apiName: string,
-  mockFunction: (...args: T) => U,
+  mockFunction: (...args: T) => Promise<U>,
   ...args: T
-) => {
+): Promise<U> => {
   const api = apiLayerGetApi(apiLayer, apiName);
   if (!api) {
     throw new Error(`No api found with the apiName = ${apiName}`);
   }
+  if (!mockFunction) {
+    throw new Error('Invalid mockFunction argument');
+  }
+  let callFunction = mockFunction;
+  const override = apiLayer.overrides[apiName];
+  if (override) {
+    callFunction = override;
+  }
   const delay = apiLayer.options.mockDelay || 0;
   if (delay) {
-    return new Promise((resolve, reject) => {
+    return new Promise<any>((resolve, reject) => {
       const start = Date.now();
-      mockFunction(...args)
+      callFunction(...args)
         .then((result) => {
           const now = Date.now();
           if (now - start < delay) {
             setTimeout(() => {
-              resolve(result);
+              resolve(result as U);
             }, delay - (now - start));
           }
         })
@@ -125,7 +133,7 @@ const callMock = <T extends Array<any>, U extends Promise<any>>(
         });
     });
   }
-  return mockFunction(...args).then((result) => {
+  return callFunction(...args).then((result) => {
     if (api.apiType === ApiType.Set) {
       // We need to invalidate all the functions attache to this
       if (api.invalidates && api.invalidates.length) {
@@ -140,26 +148,26 @@ const callMock = <T extends Array<any>, U extends Promise<any>>(
   });
 };
 
-const callApi = <T extends Array<any>, U extends Promise<any>>(
+const callApi = <T extends Array<any>, U extends any>(
   apiLayer: ApiLayer,
   apiName: string,
-  apiFunction: (...args: T) => U,
+  apiFunction: (...args: T) => Promise<U>,
   ...args: T
-) => {
+): Promise<U> => {
   const api = apiLayerGetApi(apiLayer, apiName);
   if (!api) {
     throw new Error(`No api found with the apiName = ${apiName}`);
   }
-  let callFunction: any = apiFunction;
-  const override = apiLayer.overrides[apiName];
   if (apiLayer.options.mockMode) {
-    callFunction = api.mock;
+    return api.mock(...args);
   }
+  let callFunction = apiFunction;
+  const override = apiLayer.overrides[apiName];
   if (override) {
     callFunction = override;
   }
-  return callFunction(...args).then((result: any) => {
-    if (callFunction !== api.mock && api.apiType === ApiType.Set) {
+  return callFunction(...args).then((result) => {
+    if (api.apiType === ApiType.Set) {
       // We need to invalidate all the functions attache to this
       if (api.invalidates && api.invalidates.length) {
         api.invalidates.forEach((getApi) => {
@@ -180,9 +188,9 @@ const callApi = <T extends Array<any>, U extends Promise<any>>(
  * @param {function} overrideFunction: The new function to use for the override
  * @returns {void}
  */
-export const apiLayerOverride = <T extends Array<any>, U extends Promise<any>>(
+export const apiLayerOverride = <T extends Array<any>, U extends any>(
   apiToOverride: ApiFunction,
-  overrideFunction: (...args: T) => U,
+  overrideFunction: (...args: T) => Promise<U>,
 ): void => {
   if (!apiToOverride || !isApiLayerFunction(apiToOverride)) {
     throw new Error('Invalid arguments');
@@ -230,6 +238,13 @@ const getUniqueApiName = (apiLayer: ApiLayer, name: string): string => {
   return `${name || 'unknown'}_${apiLayer.layerId}_${_installCount}`;
 };
 
+const clearCache = (func: any) => {
+  const type = typeof func;
+  if ((type === 'function' || type === 'object') && typeof func.clear === 'function') {
+    func.clear();
+  }
+};
+
 /**
  * Installs the specified API function into the given ApiLayer and returns the newly created ApiFunction
  * that can be used instead of directly calling the api function.
@@ -240,11 +255,11 @@ const getUniqueApiName = (apiLayer: ApiLayer, name: string): string => {
  * @param {InstallApiOptions} options: Options for creating the ApiFunction
  * @returns {ApiFunction} The newly created ApiFunction after its installed.
  */
-export const apiLayerInstall = <T extends Array<any>, U extends Promise<any>>(
+export const apiLayerInstall = <T extends Array<any>, U extends any>(
   apiLayer: ApiLayer,
   name: string,
-  api: (...args: T) => U,
-  mock: (...args: T) => U,
+  api: (...args: T) => Promise<U>,
+  mock: (...args: T) => Promise<U>,
   options: InstallApiOptions,
 ) => {
   checkApiLayer(apiLayer);
@@ -259,11 +274,11 @@ export const apiLayerInstall = <T extends Array<any>, U extends Promise<any>>(
   }
   // Create our new unique api name to ensure it is always unique
   const apiName = getUniqueApiName(apiLayer, name);
-  const mockLayerFunc = (...args: T): U => {
-    return callMock(apiLayer, apiName, mock, ...args) as U;
+  const mockLayerFunc = (...args: T): Promise<U> => {
+    return callMock(apiLayer, apiName, mock, ...args);
   };
-  const apiLayerFunc = (...args: T): U => {
-    return callApi(apiLayer as ApiLayer, apiName, api, ...args);
+  const apiLayerFunc = (...args: T): Promise<U> => {
+    return callApi(apiLayer, apiName, api, ...args);
   };
   // Add our special members to designate this as an api
   const additional = {
@@ -276,16 +291,9 @@ export const apiLayerInstall = <T extends Array<any>, U extends Promise<any>>(
   };
   const newApi = Object.assign(apiLayerFunc, additional);
   newApi.clear = () => {
-    if (typeof (api as any).clear === 'function') {
-      (api as any).clear();
-    }
-    if (typeof (mock as any).clear === 'function') {
-      (mock as any).clear();
-    }
-    const override = apiLayer.overrides[apiName];
-    if (override && typeof override.clear === 'function') {
-      override.clear();
-    }
+    clearCache(api);
+    clearCache(mock);
+    clearCache(apiLayer.overrides[apiName]);
   };
   // Add it to our installed list of apis and then return
   apiLayer.installed[apiName] = newApi;
@@ -299,14 +307,10 @@ export const apiLayerInstall = <T extends Array<any>, U extends Promise<any>>(
  */
 export const apiLayerClearCache = (apiLayer: ApiLayer): void => {
   Object.values(apiLayer.installed).forEach((api) => {
-    if (typeof api?.clear === 'function') {
-      api?.clear();
-    }
+    clearCache(api);
   });
   Object.values(apiLayer.overrides).forEach((api) => {
-    if (typeof api?.clear === 'function') {
-      api?.clear();
-    }
+    clearCache(api);
   });
 };
 

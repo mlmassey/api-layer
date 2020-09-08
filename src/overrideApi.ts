@@ -8,9 +8,9 @@ import { ApiFunction } from 'types/ApiFunction';
  * @param {function} overrideFunction: The new function you want to be called instead.
  * @returns {function} Returns a function that can be called to remove the installed override
  */
-export const overrideApi = <T extends Array<any>, U extends Promise<any>>(
+export const overrideApi = <T extends Array<any>, U extends any>(
   apiToOverride: ApiFunction,
-  overrideFunction: (...args: T) => U,
+  overrideFunction: (...args: T) => Promise<U>,
 ) => {
   apiLayerOverride(apiToOverride, overrideFunction);
   return () => {
