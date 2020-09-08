@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createSetApi, apiLayerCreate, isApiLayerFunction, apiLayerMockMode, createGetApi } from './index';
 
 function stringSucks(input: string): Promise<string> {
