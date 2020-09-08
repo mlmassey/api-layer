@@ -1,6 +1,6 @@
 {
   "name": "api-layer",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Asynchronous API management library",
   "type": "module",
   "main": "./lib/index.js",
