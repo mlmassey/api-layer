@@ -1,4 +1,4 @@
-import { ApiType } from 'types/ApiType';
+import { ApiType } from './types/ApiType';
 import { apiLayerInstall, ApiLayer } from './ApiLayer';
 
 /**

@@ -1,5 +1,5 @@
 import { apiLayerOverride, apiLayerRemoveOverride } from './ApiLayer';
-import { ApiFunction } from 'types/ApiFunction';
+import { ApiFunction } from './types/ApiFunction';
 
 /**
  * Overrides an existing API with a new function that will be called instead of the installed function.  This is used for

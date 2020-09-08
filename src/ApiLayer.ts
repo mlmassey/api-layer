@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { ApiFunction } from 'types/ApiFunction';
-import { ApiType } from 'types/ApiType';
+import { ApiFunction } from './types/ApiFunction';
+import { ApiType } from './types/ApiType';
 
 // Set the default delay in milliseconds. Default is 0 for no delay
 const DEFAULT_MOCK_DELAY = 0;

@@ -1,4 +1,6 @@
-import { overrideApi, isApiLayerFunction, ApiFunction } from './index';
+import { isApiLayerFunction } from './ApiLayer';
+import { ApiFunction } from './types/ApiFunction';
+import { overrideApi } from './overrideApi';
 
 export class OverrideGroup {
   overrides: { (): void }[];

@@ -1,4 +1,4 @@
-import { createMockApi } from './createMockApi';
+import { createMockApi } from './index';
 
 test('Creating a normal mock api is ok', async () => {
   const mock = createMockApi('mock result');
