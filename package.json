@@ -39,7 +39,7 @@
   "homepage": "https://github.com/mlmassey/api-layer",
   "license": "MIT",
   "files": [
-    "lib/"
+    "lib"
   ],
   "jest": {
     "modulePaths": [

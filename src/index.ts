@@ -3,7 +3,6 @@ import {
   apiLayerGetApi,
   isApiLayerFunction,
   apiLayerClearCache,
-  apiLayerMockMode,
   apiLayerSetOptions,
 } from './ApiLayerCommon';
 import { ApiLayer, ApiLayerOptions } from './types/ApiLayer';
@@ -22,7 +21,6 @@ export {
   isApiLayerFunction,
   overrideApi,
   apiLayerClearCache,
-  apiLayerMockMode,
   apiLayerSetOptions,
   createSetApi,
   createMockApi,

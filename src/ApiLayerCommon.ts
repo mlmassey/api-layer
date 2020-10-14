@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiLayerOptions, ApiLayer } from './types/ApiLayer';
 import { ApiFunction } from './types/ApiFunction';
@@ -14,6 +15,7 @@ let _installCount = 0;
 const DEFAULT_OPTIONS: ApiLayerOptions = {
   mockMode: false,
   mockDelay: DEFAULT_MOCK_DELAY,
+  onMockLoad: undefined,
 };
 
 interface InstallApiOptions {
@@ -44,7 +46,7 @@ const newApiLayerId = (): string => {
  * @returns {boolean} True if it is an ApiFunction, or false if not
  */
 export const isApiLayerFunction = (api: any): boolean => {
-  return !!(typeof api === 'function' && api.apiName);
+  return !!(typeof api === 'function' && api.uniqueId);
 };
 
 /**
@@ -66,30 +68,47 @@ export const apiLayerCreate = (options?: ApiLayerOptions): ApiLayer => {
 /**
  * Retrieves an installed API by apiName
  * @param {ApiLayer} apiLayer: The API layer to search
- * @param {string} apiName: The api name to retrieve
+ * @param {string} uniqueId: The unique Id of the api layer function
  * @returns {ApiFunction|undefined} The installed ApiFunction with the given name, or undefined if not found
  */
-export const apiLayerGetApi = (apiLayer: ApiLayer, apiName: string): ApiFunction | undefined => {
-  return apiLayer.installed[apiName];
+export const apiLayerGetApi = (apiLayer: ApiLayer, uniqueId: string): ApiFunction | undefined => {
+  return apiLayer.installed[uniqueId];
+};
+
+const _mockRequire = <T extends Array<any>, U extends any>(mockPath: string, ...args: T): Promise<U> => {
+  return new Promise((resolve) => {
+    let res: any = require(mockPath);
+    if (typeof res === 'function') {
+      res = res(...args);
+      const type = typeof res;
+      // Check to see if the result is a promise
+      if (res && (type === 'function' || type === 'object') && typeof res.then === 'function') {
+        res.then(resolve);
+        return;
+      }
+      resolve(res as U);
+      return;
+    }
+    resolve(res as U);
+  });
 };
 
 const callMock = <T extends Array<any>, U extends any>(
   apiLayer: ApiLayer,
-  apiName: string,
-  mockFunction: (...args: T) => Promise<U>,
+  api: ApiFunction,
   ...args: T
 ): Promise<U> => {
-  const api = apiLayerGetApi(apiLayer, apiName);
-  if (!api) {
-    throw new Error(`No api found with the apiName = ${apiName}`);
-  }
-  if (!mockFunction) {
-    throw new Error('Invalid mockFunction argument');
-  }
-  let callFunction = mockFunction;
-  const override = apiLayer.overrides[apiName];
-  if (override) {
-    callFunction = override;
+  let callFunction: (...args: T) => Promise<U>;
+  if (apiLayer.options && apiLayer.options.onMockLoad) {
+    callFunction = (): Promise<U> => {
+      return (apiLayer.options.onMockLoad as (api: ApiFunction) => Promise<U>)(api).then((result) => {
+        return result as U;
+      });
+    };
+  } else {
+    callFunction = (): Promise<U> => {
+      return _mockRequire(api.mock, ...args);
+    };
   }
   const delay = apiLayer.options.mockDelay || 0;
   if (delay) {
@@ -131,25 +150,27 @@ const callMock = <T extends Array<any>, U extends any>(
 
 const callApi = <T extends Array<any>, U extends any>(
   apiLayer: ApiLayer,
-  apiName: string,
+  uniqueId: string,
   apiFunction: (...args: T) => Promise<U>,
   ...args: T
 ): Promise<U> => {
-  const api = apiLayerGetApi(apiLayer, apiName);
+  const api = apiLayerGetApi(apiLayer, uniqueId);
   if (!api) {
-    throw new Error(`No api found with the apiName = ${apiName}`);
-  }
-  if (apiLayer.options.mockMode) {
-    return api.mock(...args);
+    throw new Error(`No api found with the uniqueId = ${uniqueId}`);
   }
   let callFunction = apiFunction;
-  const override = apiLayer.overrides[apiName];
+  if (apiLayer.options.mockMode) {
+    callFunction = (): Promise<U> => {
+      return callMock(apiLayer, api, ...args);
+    };
+  }
+  const override = apiLayer.overrides[uniqueId];
   if (override) {
     callFunction = override;
   }
   return callFunction(...args).then((result) => {
     if (api.apiType === ApiType.Set) {
-      // We need to invalidate all the functions attache to this
+      // We need to invalidate all the functions attached to this
       if (api.invalidates && api.invalidates.length) {
         api.invalidates.forEach((getApi) => {
           if (getApi.clear) {
@@ -181,11 +202,11 @@ export const apiLayerOverride = <T extends Array<any>, U extends any>(
     throw new Error('Do not provide an ApiFunction as the newApi');
   }
   const apiLayer = apiToOverride.apiLayer as ApiLayer;
-  const current = apiLayer.installed[apiToOverride.apiName];
+  const current = apiLayer.installed[apiToOverride.uniqueId];
   if (!current) {
-    throw new Error(`apiToOverride [${apiToOverride.name}] does not appear to have been installed previously`);
+    throw new Error(`apiToOverride [${apiToOverride.apiName}] does not appear to have been installed previously`);
   }
-  apiLayer.overrides[apiToOverride.apiName] = overrideFunction;
+  apiLayer.overrides[apiToOverride.uniqueId] = overrideFunction;
 };
 
 /**
@@ -203,20 +224,20 @@ export const apiLayerRemoveOverride = <T extends Array<any>, U extends Promise<a
   }
   const apiLayer = api.apiLayer as ApiLayer;
   checkApiLayer(apiLayer);
-  const current = apiLayer.overrides[api.apiName];
+  const current = apiLayer.overrides[api.uniqueId];
   if (overrideFunction === current) {
-    apiLayer.overrides[api.apiName] = undefined;
+    apiLayer.overrides[api.uniqueId] = undefined;
     // Clear the cache of the installed api
-    const installed = apiLayer.installed[api.apiName];
+    const installed = apiLayer.installed[api.uniqueId];
     if (installed?.clear) {
       installed?.clear();
     }
   }
 };
 
-const getUniqueApiName = (apiLayer: ApiLayer, name: string): string => {
+const getUniqueId = (apiLayer: ApiLayer): string => {
   _installCount++;
-  return `${name || 'unknown'}_${apiLayer.layerId}_${_installCount}`;
+  return `${apiLayer.layerId}_${_installCount}`;
 };
 
 const clearCache = (func: any) => {
@@ -240,44 +261,38 @@ export const apiLayerInstall = <T extends Array<any>, U extends any>(
   apiLayer: ApiLayer,
   name: string,
   api: (...args: T) => Promise<U>,
-  mock: (...args: T) => Promise<U>,
+  mock: string,
   options: InstallApiOptions,
 ) => {
   checkApiLayer(apiLayer);
-  if (typeof api !== 'function' || typeof mock !== 'function' || !options) {
+  if (typeof api !== 'function' || !mock || !options) {
     throw new Error('Invalid arguments');
   }
   if (isApiLayerFunction(api)) {
     throw new Error('Do not install an ApiFunction. Just use a regular function');
   }
-  if (isApiLayerFunction(mock)) {
-    throw new Error('Do not install an ApiFunction as a mock.  Just use a regular function');
-  }
   // Create our new unique api name to ensure it is always unique
-  const apiName = getUniqueApiName(apiLayer, name);
-  const mockLayerFunc = (...args: T): Promise<U> => {
-    return callMock(apiLayer, apiName, mock, ...args);
-  };
+  const uniqueId = getUniqueId(apiLayer);
   const apiLayerFunc = (...args: T): Promise<U> => {
-    return callApi(apiLayer, apiName, api, ...args);
+    return callApi(apiLayer, uniqueId, api, ...args);
   };
   // Add our special members to designate this as an api
   const additional = {
-    mock: mockLayerFunc,
-    apiName,
+    apiName: name,
+    uniqueId,
     apiType: options.type,
     invalidates: options.invalidates,
+    mock,
     clear: () => {},
     apiLayer,
   };
   const newApi = Object.assign(apiLayerFunc, additional);
   newApi.clear = () => {
     clearCache(api);
-    clearCache(mock);
-    clearCache(apiLayer.overrides[apiName]);
+    clearCache(apiLayer.overrides[uniqueId]);
   };
   // Add it to our installed list of apis and then return
-  apiLayer.installed[apiName] = newApi;
+  apiLayer.installed[uniqueId] = newApi;
   return newApi;
 };
 
@@ -310,32 +325,6 @@ export const apiLayerClearOverrides = (apiLayer: ApiLayer, clearCache = true): v
 };
 
 /**
- * Changes the ApiLayers mock (testing) mode. If you want to get the current state of the mock mode, you can call
- * this function with just the apiLayer argument.
- * @param {ApiLayer} apiLayer: The ApiLayer to modify
- * @param {boolean|undefined} on: If undefined, it returns the current mock mode value.  If true, turns mock mode on, or false turns it off
- * @param {number} mockDelay: Alters the default mock delay applied to all mock functions
- * @param {boolean} clearCache: Clears all ApiFunction caches when called if the mode is changed. Default is true
- * @returns {boolean} The new state of the mock mode
- */
-export const apiLayerMockMode = (apiLayer: ApiLayer, on?: boolean, mockDelay?: number, clearCache = true): boolean => {
-  checkApiLayer(apiLayer);
-  const current = !!apiLayer.options.mockMode;
-  const newState = on === undefined ? !!apiLayer.options.mockMode : !!on;
-  if (mockDelay !== undefined) {
-    apiLayer.options.mockDelay = mockDelay;
-  }
-  if (current === newState) {
-    return current;
-  }
-  apiLayer.options.mockMode = newState;
-  if (clearCache) {
-    apiLayerClearCache(apiLayer);
-  }
-  return newState;
-};
-
-/**
  * Sets the ApiLayer options after it has been created
  * @param {ApiLayer} apiLayer: The ApiLayer to modify
  * @param {ApiLayerOptions|undefined} options: If undefined, returns a copy of the current options.  If it has a value, the new values is merged into the current options
@@ -351,7 +340,9 @@ export const apiLayerSetOptions = (
   if (!options) {
     return { ...apiLayer.options };
   }
+  const mockMode = apiLayer.options.mockMode;
   const ops = Object.assign({}, apiLayer.options, options);
+  ops.mockMode = mockMode;
   apiLayer.options = ops;
   if (clearCache) {
     apiLayerClearCache(apiLayer);

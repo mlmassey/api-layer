@@ -6,7 +6,7 @@ import { apiLayerCreate, createGetApi } from '../../src';
 const ajv = new Ajv();
 
 // Create our apiLayer for testing
-const apiLayer = apiLayerCreate({ mockMode: true });
+const apiLayer = apiLayerCreate({ mockMode: false });
 
 // Create our JSON schema and Typescript interface for our API
 interface UserData {
@@ -68,11 +68,11 @@ function validate(schema: any, func: () => Promise<UserData>): () => Promise<Use
 }
 
 // Now create our api function and make sure to include the validator
-const apiGetUserData = createGetApi(apiLayer, validate(schema, getUserData), validate(schema, getUserData));
+const apiGetUserData = createGetApi(apiLayer, validate(schema, getUserData), 'mock is never called so this is ignored');
 const apiGetUserDataInvalid = createGetApi(
   apiLayer,
   validate(schema, invalidUserData),
-  validate(schema, invalidUserData),
+  'mock is never called so this is ignored',
 );
 
 test('Data validation example', async () => {

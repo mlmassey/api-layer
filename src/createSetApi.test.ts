@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { createSetApi, apiLayerCreate, isApiLayerFunction, apiLayerMockMode, createGetApi } from './index';
 
+const MOCK_FUNCTION = '../samples/api/mock/mockModuleExports.js';
+const MOCK_RESULT = '../samples/api/mock/mockComplex.json';
+
 function stringSucks(input: string): Promise<string> {
   const result = `${input} sucks`;
-  return Promise.resolve(result);
-}
-
-function mockStringSucks(input: string): Promise<string> {
-  const result = `mock ${input} sucks`;
   return Promise.resolve(result);
 }
 
@@ -16,7 +14,7 @@ function errorTest(input: string): Promise<string> {
 }
 
 const apiLayer = apiLayerCreate({ mockDelay: 0 });
-const apiFunction = createSetApi(apiLayer, stringSucks, mockStringSucks);
+const apiFunction = createSetApi(apiLayer, stringSucks, MOCK_FUNCTION);
 
 test('Default behavior', async () => {
   let original = 'test';
@@ -25,17 +23,11 @@ test('Default behavior', async () => {
   expect(original).toBe('test sucks');
 });
 
-test('Calling mock function directly', async () => {
-  let original = 'test';
-  original = await (apiFunction as any).mock(original);
-  expect(original).toBe('mock test sucks');
-});
-
 test('Setting api layer mock mode to on', async () => {
   let original = 'test';
   apiLayerMockMode(apiLayer, true);
   original = await apiFunction(original);
-  expect(original).toBe('mock test sucks');
+  expect(original).toBe('test mock');
 });
 
 test('Change mock delay increases delay of mock response', async () => {
@@ -44,13 +36,13 @@ test('Change mock delay increases delay of mock response', async () => {
   const start = Date.now();
   original = await apiFunction(original);
   const finish = Date.now();
-  expect(original).toBe('mock test sucks');
+  expect(original).toBe('test mock');
   expect(finish - start).toBeGreaterThanOrEqual(1000);
 });
 
 test('Not supplying a mock function throws error', () => {
   expect(() => {
-    createSetApi(apiLayer, undefined as any, mockStringSucks);
+    createSetApi(apiLayer, undefined as any, MOCK_RESULT);
   }).toThrowError();
 });
 
@@ -61,16 +53,16 @@ test('Not supplying a proper function throws error', () => {
 });
 
 test('Error results is properly returned', () => {
-  const errorApi = createSetApi(apiLayer, errorTest, mockStringSucks);
+  const errorApi = createSetApi(apiLayer, errorTest, MOCK_RESULT);
   return errorApi('test').catch((error) => {
     expect(error).toBe('error result');
   });
 });
 
 test('Trying to assign api layer functions throws error', () => {
-  const getApi = createSetApi(apiLayer, stringSucks, mockStringSucks);
+  const getApi = createSetApi(apiLayer, stringSucks, MOCK_RESULT);
   expect(() => {
-    createSetApi(apiLayer, getApi, mockStringSucks);
+    createSetApi(apiLayer, getApi, MOCK_RESULT);
   }).toThrowError();
 });
 
@@ -83,9 +75,9 @@ test('Api invalidation when set is working', async () => {
     result = 'clear';
   };
   const layer = apiLayerCreate();
-  const getApi = createGetApi(layer, test, mockStringSucks);
-  const getApiWithNoClear = createGetApi(layer, stringSucks, mockStringSucks);
-  const setApi = createSetApi(layer, stringSucks, mockStringSucks, [getApi, getApiWithNoClear]);
+  const getApi = createGetApi(layer, test, MOCK_RESULT);
+  const getApiWithNoClear = createGetApi(layer, stringSucks, MOCK_RESULT);
+  const setApi = createSetApi(layer, stringSucks, MOCK_RESULT, [getApi, getApiWithNoClear]);
   await setApi('test');
   expect(result).toBe('clear');
 });

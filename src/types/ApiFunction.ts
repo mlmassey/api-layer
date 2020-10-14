@@ -4,9 +4,11 @@ import { ApiType } from './ApiType';
 export interface ApiFunction {
   /** Main api function */
   (...args: any): Promise<any>;
-  /** Mock function that should return a mock result */
-  mock: (...args: any) => Promise<any>;
-  /** The unique name of the api */
+  /** Path to mock data or mock data identifier */
+  mock: string;
+  /** Unique string identifier for the api function */
+  uniqueId: string;
+  /** The friendly name of the api function */
   apiName: string;
   /** The type of the api (get or set) */
   apiType: ApiType;

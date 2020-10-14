@@ -5,7 +5,7 @@ The following sample demonstrates using the ApiLayer for your tests and overridi
 It is recommended that you check if you are running in your unit test environment and set your ApiLayer into mock mode automatically when you call [apiLayerCreate](../../src/ApiLayer.ts). See the sample [apiLayer](../api/apiLayer.ts) for an example.
 
 # Default mock implementations
-When you create your API functions using [createGetApi](../../src/createGetApi.ts) or [createSetApi]../../src/createSetApi.ts), the ApiLayer requires you to provide a default mock implementation.  This default implementation should return a positive/valid response that can be used in your application tests.  
+When you create your API functions using [createGetApi](../../src/createGetApi.ts) or [createSetApi]../../src/createSetApi.ts), the ApiLayer requires you to provide the file path to a default mock implementation.  This default implementation should return a positive/valid response that can be used in your application tests.  
 
 # Creating mock implementations
 ApiLayer provides a helper function called [createMockApi](../../src/createMockApi.ts) that can be used to easily create mock implementations to test different functionality.  

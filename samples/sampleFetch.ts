@@ -4,7 +4,7 @@
 export function sampleFetch(url: string, options: any) {
   return Promise.resolve({
     json: () => {
-      return options.response;
+      return options && options.response;
     },
   });
 }

@@ -9,8 +9,10 @@ The following recommendations are based on usage of ApiLayer in large projects. 
 4. Start your api filenames with `api` to easily identify that they are an api-layer managed function.
 5. Any function that modifies data on your server (such as POST/PUT/DELETE) is considered a `SET` function and should be created using [createSetApi](../../src/createSetApi.ts).  Any function that only gets/reads information from your server (such as GET/POST) is considered a `GET` function and should be created using [createGetApi](../../src/createGetApi.ts).
 6. Include `Get` or `Set` in your api function name to easily identify the function they perform.
-7. In each API file, define a function to make the actual api call, as well as the mock version.  Keeping them in the same file makes it easier to update if there are any changes.
-8. Declare the API URL at the top of the file as a `const` so it can be easily modified.  You could also import it from a separate file, since many of your ApiLayer functions will use the same URL resource identifier.
+7. Declare the API URL at the top of the file as a `const` so it can be easily modified.  You could also import it from a separate file, since many of your ApiLayer functions will use the same URL resource identifier.
+8. Your mock implementation can be a simple JSON file or a Javascript function that is exported using `module.exports =`.  You can see samples of different types of implementations in the [mock folder](../api/mock).  
+9. You should use `require.resolve` to provide the file path to your mock implementation file, since the ApiLayer internally uses `require` when 
+importing the results.
 
 # Sample Workflow
 The sample code you can follow can be found in [sample.test.ts](./sample.test.ts).  This is a Jest unit test, but still demonstrates usage.

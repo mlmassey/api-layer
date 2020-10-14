@@ -1,4 +1,4 @@
 export enum ApiType {
-  Get = 'Get',
-  Set = 'Set',
+  Get = 'get',
+  Set = 'set',
 }

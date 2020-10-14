@@ -1,0 +1,9 @@
+{
+  "field1": [
+    "a",
+    "b"
+  ],
+  "field2": {
+    "inner": "inner field"
+  }
+}

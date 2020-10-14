@@ -1,16 +1,18 @@
 import { OverrideGroup, apiLayerCreate, createGetApi } from './index';
 
-const apiLayer = apiLayerCreate({ mockMode: true });
+const MOCK_RESULT = '../samples/api/mock/mockSimple.json';
+
+const apiLayer = apiLayerCreate({ mockMode: false });
 
 function get1() {
   return Promise.resolve('get1');
 }
-const apiGet1 = createGetApi(apiLayer, get1, get1);
+const apiGet1 = createGetApi(apiLayer, get1, MOCK_RESULT);
 
 function get2() {
   return Promise.resolve('get2');
 }
-const apiGet2 = createGetApi(apiLayer, get2, get2);
+const apiGet2 = createGetApi(apiLayer, get2, MOCK_RESULT);
 
 function override1() {
   return Promise.resolve('override1');

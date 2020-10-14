@@ -22,19 +22,11 @@ function getUserIdByUsername(username: string): Promise<string> {
     });
 }
 
-// We create a mock version of the api call that returns a valid/good response that can be used for our testing
-// purposes that developers who use this api don't have to really understand the resulting value or how it works
-// Also, if we update the API call later, we can easily change this mock to match, since its in the same file
-function mockGetUserIdByUsername(username: string): Promise<string> {
-  const sampleUser: User = {
-    id: '1',
-    name: 'Test User',
-    email: 'test@test.com',
-  };
-  return Promise.resolve(sampleUser.id);
-}
-
 // Now we create our api using api-layer's createGetApi, since this api is a GET REST call and retrieves information
 // Typescript will throw an error if your function signatures do not match, and the resulting function will have all
 // the same type information for arguments and return value as the actual API call.
-export const apiGetUserIdByUsername = createGetApi(apiLayer, getUserIdByUsername, mockGetUserIdByUsername);
+export const apiGetUserIdByUsername = createGetApi(
+  apiLayer,
+  getUserIdByUsername,
+  require.resolve('./mock/mockGetUserIdByUsername.js'),
+);

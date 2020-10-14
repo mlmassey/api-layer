@@ -17,16 +17,12 @@ function setUser(user: User): Promise<User> {
   }).then((response) => response.json());
 }
 
-// We create a mock version of the api call that returns a valid/good response that can be used for our testing
-// purposes that developers who use this api don't have to really understand the resulting value or how it works
-// Also, if we update the API call later, we can easily change this mock to match, since its in the same file
-function mockSetUser(user: User): Promise<User> {
-  return Promise.resolve(user);
-}
-
 // Now we create our api using api-layer's createSetApi, since this api is a POST REST call and saves information
 // Typescript will throw an error if your function signatures do not match, and the resulting function will have all
 // the same type information for arguments and return value as the actual API call.
 // NOTE: We specify which GET api calls will be invalidated by changing this user to clear any cached information
 // that they may have.
-export const apiSetUser = createSetApi(apiLayer, setUser, mockSetUser, [apiGetUserById, apiGetUserIdByUsername]);
+export const apiSetUser = createSetApi(apiLayer, setUser, require.resolve('./mock/mockSetUser.js'), [
+  apiGetUserById,
+  apiGetUserIdByUsername,
+]);
