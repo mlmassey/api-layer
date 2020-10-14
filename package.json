@@ -16,9 +16,9 @@
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
-    "version": "npm run format && git add -A src",
+    "version": "npm run format && npm run changelog && git add -A src && git add CHANGELOG.md",
     "postversion": "git push && git push --tags",
-    "changelog": "auto-changelog"
+    "changelog": "auto-changelog -p --breaking-pattern \"BREAKING:\""
   },
   "keywords": [
     "api",
