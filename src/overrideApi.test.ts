@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { apiLayerCreate, overrideApi, apiLayerMockMode, createGetApi } from './index';
+import { apiLayerCreate, overrideApi, createGetApi } from './index';
 
 const MOCK_RESULT = '../samples/api/mock/mockSimple.json';
 
@@ -8,15 +8,6 @@ const apiLayer = apiLayerCreate();
 function stringSucks(input: string): Promise<string> {
   const result = `${input} sucks`;
   return Promise.resolve(result);
-}
-
-function mockStringSucks(input: string): Promise<string> {
-  const result = `mock ${input} sucks`;
-  return Promise.resolve(result);
-}
-
-function errorTest(input: string): Promise<string> {
-  return Promise.reject('error result');
 }
 
 function overrideFunc(input: string): Promise<string> {
@@ -28,7 +19,7 @@ function overrideFunc2(input: string): Promise<string> {
 }
 
 test('Creating an api override works', async () => {
-  const getApi = createGetApi(apiLayer, stringSucks, MOCK_RESULT);
+  const getApi = createGetApi(apiLayer, stringSucks, require.resolve(MOCK_RESULT));
   overrideApi(getApi, overrideFunc);
   const result = await getApi('test');
   expect(result).toEqual('test override');
@@ -42,41 +33,38 @@ test('Passing in a non-api function throws an error', async () => {
 });
 
 test('Passing in an api function throws an error', async () => {
-  const getApi = createGetApi(apiLayer, stringSucks, MOCK_RESULT);
+  const getApi = createGetApi(apiLayer, stringSucks, require.resolve(MOCK_RESULT));
   expect(() => overrideApi(getApi, getApi)).toThrowError();
 });
 
 test('Setting to mock mode for overrides still returns the same value', async () => {
-  const getApi = createGetApi(apiLayer, stringSucks, MOCK_RESULT);
+  const mockLayer = apiLayerCreate({ mockMode: true });
+  const getApi = createGetApi(mockLayer, stringSucks, require.resolve(MOCK_RESULT));
   overrideApi(getApi, overrideFunc);
-  apiLayerMockMode(apiLayer, true);
   const result = await getApi('test');
   expect(result).toEqual('test override');
 });
 
 test('Creating multiple mocks overrides the previous', async () => {
-  const getApi = createGetApi(apiLayer, stringSucks, MOCK_RESULT);
+  const getApi = createGetApi(apiLayer, stringSucks, require.resolve(MOCK_RESULT));
   overrideApi(getApi, overrideFunc);
   overrideApi(getApi, overrideFunc2);
-  apiLayerMockMode(apiLayer, false);
   const result = await getApi('test');
   expect(result).toEqual('test override2');
 });
 
 test('Removing an override works ok', async () => {
-  const getApi = createGetApi(apiLayer, stringSucks, MOCK_RESULT);
+  const getApi = createGetApi(apiLayer, stringSucks, require.resolve(MOCK_RESULT));
   const removeOverride = overrideApi(getApi, overrideFunc);
-  apiLayerMockMode(apiLayer, false);
   removeOverride();
   const result = await getApi('test');
   expect(result).toEqual('test sucks');
 });
 
 test('Removing an override does nothing if already removed', async () => {
-  const getApi = createGetApi(apiLayer, stringSucks, MOCK_RESULT);
+  const getApi = createGetApi(apiLayer, stringSucks, require.resolve(MOCK_RESULT));
   const removeOverride = overrideApi(getApi, overrideFunc);
   const override2 = overrideApi(getApi, overrideFunc2);
-  apiLayerMockMode(apiLayer, false);
   removeOverride();
   const result = await getApi('test');
   expect(result).toEqual('test override2');

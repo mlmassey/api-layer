@@ -9,7 +9,7 @@
  * @returns {function}: A mock function that can be called to return the desired result
  */
 export const createMockApi = <T extends Array<any>, U extends any>(
-  result: U,
+  result?: U,
   failure?: any,
   callback?: (...args: T) => Promise<U>,
   delay?: number,

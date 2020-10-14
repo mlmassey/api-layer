@@ -107,7 +107,7 @@ test('Trying to assign api layer functions throws error', () => {
 });
 
 test('Invalid mock path throws an error', async () => {
-  const getApi = createGetApi(productionLayer, stringSucks, 'invalid path');
+  const getApi = createGetApi(mockLayer, stringSucks, 'invalid path');
   expect(getApi('hello')).rejects.toBeTruthy();
 });
 

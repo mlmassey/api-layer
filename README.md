@@ -1,5 +1,5 @@
 # api-layer
-api-layer is a very simple API management library that helps you clearly define an abstraction layer for your API calls to ensure that they are easily mockable or overridden.  You can also easily add a client-side API caching to greatly improve your apps performance.  It has no dependencies and fully supports Typescript and Javascript.  
+api-layer is a very simple API organization library that helps you clearly define an abstraction layer for your API calls to ensure that they are easily mockable or overridden.  You can also easily add a client-side API caching to greatly improve your apps performance.  It has no dependencies and supports Typescript and Javascript.  
 
 # Installation
 Using npm:

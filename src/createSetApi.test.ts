@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createSetApi, apiLayerCreate, isApiLayerFunction, apiLayerMockMode, createGetApi } from './index';
+import { createSetApi, apiLayerCreate, isApiLayerFunction, createGetApi } from './index';
 
 const MOCK_FUNCTION = '../samples/api/mock/mockModuleExports.js';
 const MOCK_RESULT = '../samples/api/mock/mockComplex.json';
@@ -13,31 +13,34 @@ function errorTest(input: string): Promise<string> {
   return Promise.reject('error result');
 }
 
-const apiLayer = apiLayerCreate({ mockDelay: 0 });
-const apiFunction = createSetApi(apiLayer, stringSucks, MOCK_FUNCTION);
+const apiLayer = apiLayerCreate();
+const mockLayer = apiLayerCreate({ mockMode: true, mockDelay: 0 });
 
 test('Default behavior', async () => {
   let original = 'test';
-  original = await apiFunction(original);
-  expect(isApiLayerFunction(apiFunction)).toBeTruthy();
+  const api = createSetApi(apiLayer, stringSucks, require.resolve(MOCK_FUNCTION));
+  original = await api(original);
+  expect(isApiLayerFunction(api)).toBeTruthy();
   expect(original).toBe('test sucks');
 });
 
-test('Setting api layer mock mode to on', async () => {
+test('Setting api layer with mock mode', async () => {
   let original = 'test';
-  apiLayerMockMode(apiLayer, true);
-  original = await apiFunction(original);
+  const api = createSetApi(mockLayer, stringSucks, require.resolve(MOCK_FUNCTION));
+  original = await api(original);
+  expect(isApiLayerFunction(api)).toBeTruthy();
   expect(original).toBe('test mock');
 });
 
 test('Change mock delay increases delay of mock response', async () => {
+  const delayedLayer = apiLayerCreate({ mockMode: true, mockDelay: 3000 });
   let original = 'test';
-  apiLayerMockMode(apiLayer, true, 1000, true);
   const start = Date.now();
-  original = await apiFunction(original);
+  const api = createGetApi(delayedLayer, stringSucks, require.resolve(MOCK_FUNCTION));
+  original = await api(original);
   const finish = Date.now();
   expect(original).toBe('test mock');
-  expect(finish - start).toBeGreaterThanOrEqual(1000);
+  expect(finish - start).toBeGreaterThanOrEqual(3000);
 });
 
 test('Not supplying a mock function throws error', () => {
@@ -75,9 +78,9 @@ test('Api invalidation when set is working', async () => {
     result = 'clear';
   };
   const layer = apiLayerCreate();
-  const getApi = createGetApi(layer, test, MOCK_RESULT);
-  const getApiWithNoClear = createGetApi(layer, stringSucks, MOCK_RESULT);
-  const setApi = createSetApi(layer, stringSucks, MOCK_RESULT, [getApi, getApiWithNoClear]);
+  const getApi = createGetApi(layer, test, require.resolve(MOCK_RESULT));
+  const getApiWithNoClear = createGetApi(layer, stringSucks, require.resolve(MOCK_RESULT));
+  const setApi = createSetApi(layer, stringSucks, require.resolve(MOCK_RESULT), [getApi, getApiWithNoClear]);
   await setApi('test');
   expect(result).toBe('clear');
 });

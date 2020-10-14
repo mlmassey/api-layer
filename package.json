@@ -1,7 +1,7 @@
 {
   "name": "api-layer",
   "version": "0.4.2",
-  "description": "Asynchronous API management library",
+  "description": "Asynchronous API organization library",
   "type": "module",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
@@ -17,7 +17,8 @@
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "changelog": "auto-changelog"
   },
   "keywords": [
     "api",
@@ -77,7 +78,8 @@
     "memoizee": "^0.4.14",
     "prettier": "^2.0.4",
     "ts-jest": "^25.3.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "auto-changelog": "^2.2.1"
   },
   "husky": {
     "hooks": {
