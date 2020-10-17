@@ -4,8 +4,10 @@ import { ApiType } from './ApiType';
 export interface ApiFunction {
   /** Main api function */
   (...args: any): Promise<any>;
+  /** The original wrapped function */
+  original: (...args: any) => Promise<any>;
   /** Path to mock data or mock data identifier */
-  mock: string;
+  mockPath: string;
   /** Unique string identifier for the api function */
   uniqueId: string;
   /** The friendly name of the api function */
@@ -15,7 +17,11 @@ export interface ApiFunction {
   /** List of apis that this function will invalidate once called */
   invalidates?: Array<ApiFunction>;
   /** Clears the cache for this api (if cached) */
-  clear?: () => void;
-  /** The ApiLayer this is installed into */
-  apiLayer?: any;
+  clear: () => void;
+  /** Called to override this ApiFunction */
+  override: (overrideFunc: (...args: any) => Promise<any>) => void;
+  /** Clears the current override */
+  clearOverride: (overrideFunc: (...args: any) => Promise<any>) => void;
+  /** Last apiLayer cache clear identifier */
+  lastApiCacheClear?: any;
 }

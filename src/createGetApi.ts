@@ -1,6 +1,14 @@
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiType } from './types/ApiType';
-import { apiLayerInstall } from './ApiLayerCommon';
 import { ApiLayer } from './types/ApiLayer';
+import {
+  getApiCallFunction,
+  apiLayerOverride,
+  apiLayerRemoveOverride,
+  getApiUniqueId,
+  isApiLayerFunction,
+} from './ApiLayerCommon';
 
 /**
  * Creates a new GET API function that wraps your provided API function to allow it be overridden.  This should be only
@@ -12,17 +20,57 @@ import { ApiLayer } from './types/ApiLayer';
  * @returns {ApiFunction} The API function you can call directly, just as you would the apiFunction parameter provided.
  */
 export const createGetApi = <T extends Array<any>, U extends any>(
-  apiLayer: ApiLayer,
   apiFunction: (...args: T) => Promise<U>,
   mockPath: string,
   apiName?: string,
+  apiLayer?: ApiLayer,
 ) => {
-  if (!apiLayer || !apiFunction || !mockPath) {
+  if (!apiFunction) {
     throw new Error('Invalid empty arguments');
   }
+  if (isApiLayerFunction(apiFunction)) {
+    throw new Error('apiFunction cannot be an existing ApiFunction');
+  }
+  if (!mockPath) {
+    throw new Error(
+      'It is required that you provide the path to the mock implementation.  This mock should return a typical/positive result',
+    );
+  }
   const name = apiName || apiFunction.name || '';
-  const options = {
-    type: ApiType.Get,
+  const uniqueId = getApiUniqueId(name);
+  let clear: () => void = () => {};
+  const type = typeof apiFunction;
+  if ((type === 'function' || type === 'object') && typeof (apiFunction as any).clear === 'function') {
+    clear = (apiFunction as any).clear;
+  }
+  let newApi: any;
+  const override = (overrideFunc: (...args: T) => Promise<U>) => {
+    apiLayerOverride(newApi, overrideFunc, apiLayer);
   };
-  return apiLayerInstall(apiLayer, name, apiFunction, mockPath, options);
+  const clearOverride = (overrideFunc: (...args: T) => Promise<U>) => {
+    apiLayerRemoveOverride(newApi, overrideFunc, apiLayer);
+  };
+  const apiLayerFunc = (...args: T): Promise<U> => {
+    return new Promise((resolve, reject) => {
+      const callFunc = getApiCallFunction(apiFunction, newApi, undefined, undefined, apiLayer);
+      return callFunc(...args)
+        .then(resolve)
+        .catch(reject);
+    });
+  };
+  // Add our special members to designate this as an api
+  const additional = {
+    apiName: name,
+    uniqueId,
+    apiType: ApiType.Get,
+    invalidates: [],
+    mockPath,
+    clear,
+    override,
+    clearOverride,
+    original: apiFunction,
+  };
+  const result = Object.assign(apiLayerFunc, additional);
+  newApi = result;
+  return result;
 };

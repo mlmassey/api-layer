@@ -1,5 +1,4 @@
 import { createSetApi } from '../../../src';
-import { apiLayer } from '../apiLayer';
 import { sampleFetch } from '../../sampleFetch';
 import { apiGetUserById } from './apiGetUserById';
 import { apiGetUserIdByUsername } from './apiGetUserIdByUsername';
@@ -21,7 +20,7 @@ function deleteUser(id: string): Promise<boolean> {
 // the same type information for arguments and return value as the actual API call.
 // NOTE: We specify which GET api calls will be invalidated by changing this user to clear any cached information
 // that they may have.
-export const apiDeleteUser = createSetApi(apiLayer, deleteUser, require.resolve('./mock/mockDeleteUser.js'), [
+export const apiDeleteUser = createSetApi(deleteUser, 'user/mock/apiDeleteUser.mock.js', [
   apiGetUserById,
   apiGetUserIdByUsername,
 ]);

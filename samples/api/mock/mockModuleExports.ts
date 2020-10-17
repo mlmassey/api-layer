@@ -1,0 +1,1 @@
+/* This should fail because Typescript is not supported */

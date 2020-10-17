@@ -25,8 +25,4 @@ function getUserIdByUsername(username: string): Promise<string> {
 // Now we create our api using api-layer's createGetApi, since this api is a GET REST call and retrieves information
 // Typescript will throw an error if your function signatures do not match, and the resulting function will have all
 // the same type information for arguments and return value as the actual API call.
-export const apiGetUserIdByUsername = createGetApi(
-  apiLayer,
-  getUserIdByUsername,
-  require.resolve('./mock/mockGetUserIdByUsername.js'),
-);
+export const apiGetUserIdByUsername = createGetApi(getUserIdByUsername, 'user/mock/apiGetUserIdByUsername.mock.js');

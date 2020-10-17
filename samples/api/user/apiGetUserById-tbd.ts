@@ -12,4 +12,4 @@ function getUserById(id: string): Promise<User> {
 // Typescript will throw an error if your function signatures do not match, and the resulting function will have all
 // the same type information for arguments and return value as the actual API call.
 // Since this is an early/tbd version, we use the mock version for the real api.
-export const apiGetUserById = createGetApi(apiLayer, getUserById, require.resolve('./mock/mockGetUserById.js'));
+export const apiGetUserById = createGetApi(getUserById, 'user/mock/apiGetUserById.mock.js');

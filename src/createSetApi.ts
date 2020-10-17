@@ -1,7 +1,15 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable prefer-const */
 import { ApiType } from './types/ApiType';
-import { apiLayerInstall } from './ApiLayerCommon';
 import { ApiFunction } from './types/ApiFunction';
 import { ApiLayer } from './types/ApiLayer';
+import {
+  getApiCallFunction,
+  apiLayerOverride,
+  apiLayerRemoveOverride,
+  getApiUniqueId,
+  isApiLayerFunction,
+} from './ApiLayerCommon';
 
 /**
  * Creates a new SET API function that wraps your provided API function to allow it be overridden.  This should be
@@ -16,25 +24,75 @@ import { ApiLayer } from './types/ApiLayer';
  * @returns {ApiFunction} The API function you can call directly, just as you would the apiFunction parameter provided.
  */
 export const createSetApi = <T extends Array<any>, U extends any>(
-  apiLayer: ApiLayer,
   apiFunction: (...args: T) => Promise<U>,
   mockPath: string,
-  invalidates?: ApiFunction | Array<ApiFunction>,
+  invalidates?: ApiFunction | Array<ApiFunction> | undefined,
   apiName?: string,
+  apiLayer?: ApiLayer,
 ) => {
-  if (!apiLayer || !apiFunction || !mockPath) {
+  if (!apiFunction) {
     throw new Error('Invalid empty arguments');
   }
+  if (isApiLayerFunction(apiFunction)) {
+    throw new Error('apiFunction cannot be an existing ApiFunction');
+  }
+  if (!mockPath) {
+    throw new Error(
+      'It is required that you provide the path to the mock implementation.  This mock should return a typical/positive result',
+    );
+  }
   const name = apiName || apiFunction.name || '';
+  const uniqueId = getApiUniqueId(name);
+  let clear: () => void = () => {};
+  const type = typeof apiFunction;
+  if ((type === 'function' || type === 'object') && typeof (apiFunction as any).clear === 'function') {
+    clear = (apiFunction as any).clear;
+  }
   let invalids: Array<ApiFunction> = [];
   if (Array.isArray(invalidates)) {
     invalids = invalids.concat(invalidates);
   } else if (invalidates) {
     invalids.push(invalidates);
   }
-  const options = {
-    type: ApiType.Set,
-    invalidates: invalids,
+  let newApi: any;
+  const override = (overrideFunc: (...args: T) => Promise<U>) => {
+    apiLayerOverride(newApi, overrideFunc, apiLayer);
   };
-  return apiLayerInstall(apiLayer, name, apiFunction, mockPath, options);
+  const clearOverride = (overrideFunc: (...args: T) => Promise<U>) => {
+    apiLayerRemoveOverride(newApi, overrideFunc, apiLayer);
+  };
+  const apiLayerFunc = (...args: T): Promise<U> => {
+    return new Promise((resolve, reject) => {
+      const callFunc = getApiCallFunction(apiFunction, newApi, undefined, undefined, apiLayer);
+      callFunc(...args)
+        .then((result: any) => {
+          // We need to invalidate all the apis that are specified to this function
+          if (invalids && invalids.length) {
+            invalids.forEach((getApi: ApiFunction) => {
+              if (getApi.clear) {
+                getApi.clear();
+              }
+            });
+          }
+          return result;
+        })
+        .then(resolve)
+        .catch(reject);
+    });
+  };
+  // Add our special members to designate this as an api
+  const additional = {
+    apiName: name,
+    uniqueId,
+    apiType: ApiType.Set,
+    invalidates: invalids,
+    mockPath,
+    clear,
+    override,
+    clearOverride,
+    original: apiFunction,
+  };
+  const result = Object.assign(apiLayerFunc, additional);
+  newApi = result;
+  return result;
 };

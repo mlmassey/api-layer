@@ -1,3 +1,4 @@
+import { ApiLayer } from '.';
 import { apiLayerOverride, apiLayerRemoveOverride } from './ApiLayerCommon';
 import { ApiFunction } from './types/ApiFunction';
 
@@ -11,9 +12,10 @@ import { ApiFunction } from './types/ApiFunction';
 export const overrideApi = <T extends Array<any>, U extends any>(
   apiToOverride: ApiFunction,
   overrideFunction: (...args: T) => Promise<U>,
+  apiLayer?: ApiLayer,
 ) => {
-  apiLayerOverride(apiToOverride, overrideFunction);
+  apiLayerOverride(apiToOverride, overrideFunction, apiLayer);
   return () => {
-    apiLayerRemoveOverride(apiToOverride, overrideFunction);
+    apiLayerRemoveOverride(apiToOverride, overrideFunction, apiLayer);
   };
 };

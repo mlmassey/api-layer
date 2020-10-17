@@ -1,12 +1,13 @@
 /* eslint-disable import/default */
 /* eslint-disable import/no-extraneous-dependencies */
 import Ajv from 'ajv';
-import { apiLayerCreate, createGetApi } from '../../src';
+import { apiLayerCreate, createGetApi, NodeMockResolver } from '../../src';
+
+// Create the global api layer in production mode
+const mockResolver = new NodeMockResolver();
+apiLayerCreate({ mockResolver });
 
 const ajv = new Ajv();
-
-// Create our apiLayer for testing
-const apiLayer = apiLayerCreate({ mockMode: false });
 
 // Create our JSON schema and Typescript interface for our API
 interface UserData {
@@ -68,9 +69,8 @@ function validate(schema: any, func: () => Promise<UserData>): () => Promise<Use
 }
 
 // Now create our api function and make sure to include the validator
-const apiGetUserData = createGetApi(apiLayer, validate(schema, getUserData), 'mock is never called so this is ignored');
+const apiGetUserData = createGetApi(validate(schema, getUserData), 'mock is never called so this is ignored');
 const apiGetUserDataInvalid = createGetApi(
-  apiLayer,
   validate(schema, invalidUserData),
   'mock is never called so this is ignored',
 );

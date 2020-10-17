@@ -1,11 +1,14 @@
 import { isApiLayerFunction } from './ApiLayerCommon';
 import { ApiFunction } from './types/ApiFunction';
 import { overrideApi } from './overrideApi';
+import { ApiLayer } from '.';
 
 export class OverrideGroup {
   overrides: { (): void }[];
-  constructor() {
+  apiLayer?: ApiLayer;
+  constructor(apiLayer?: ApiLayer) {
     this.overrides = [];
+    this.apiLayer = apiLayer;
     this.add = this.add.bind(this);
     this.removeAll = this.removeAll.bind(this);
   }
@@ -31,7 +34,7 @@ export class OverrideGroup {
       throw new Error('Invalid empty overrideFunc');
     }
     // We assume this is an ApiFunction and we are adding it
-    const remove = overrideApi(apiOrHandle as ApiFunction, overrideFunc);
+    const remove = overrideApi(apiOrHandle as ApiFunction, overrideFunc, this.apiLayer);
     this.overrides.push(remove);
     return this;
   }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import '../api/apiLayer';
 import { apiGetUserById, User } from '../api/user';
-import { apiLayer } from '../api/apiLayer';
 import { createMockApi, overrideApi } from '../../src';
 
 // We are going to create 3 sample mock apis to use in our testing to test different conditions

@@ -1,0 +1,4 @@
+/* This should not work because this requires a compiler like babel.  Only module.exports works */
+export function test() {
+  return;
+}

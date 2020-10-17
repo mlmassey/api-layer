@@ -2,28 +2,24 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ApiLayerOptions, ApiLayer } from './types/ApiLayer';
 import { ApiFunction } from './types/ApiFunction';
-import { ApiType } from './types/ApiType';
 
 // Set the default delay in milliseconds. Default is 0 for no delay
 const DEFAULT_MOCK_DELAY = 0;
 const API_LAYER_PREFIX = 'api';
+const API_UNIQUE_PREFIX = 'api';
 
 // Global counters for creating unique ids
 let _layerCreateCount = 0;
-let _installCount = 0;
+let _uniqueIdCount = 0;
+// Global API layer variable
+let _globalApiLayer: ApiLayer | undefined;
 
-const DEFAULT_OPTIONS: ApiLayerOptions = {
+const DEFAULT_OPTIONS: any = {
   mockMode: false,
   mockDelay: DEFAULT_MOCK_DELAY,
-  onMockLoad: undefined,
+  mockResolver: undefined,
+  installGlobal: true,
 };
-
-interface InstallApiOptions {
-  /** The API function type (Get or Set) */
-  type: ApiType;
-  /** Array of GET ApiFunctions that are invalidated when the SET api is called */
-  invalidates?: Array<ApiFunction>;
-}
 
 export const isApiLayer = (layer: any): boolean => {
   return !!(typeof layer === 'object' && layer.layerId);
@@ -31,6 +27,9 @@ export const isApiLayer = (layer: any): boolean => {
 
 const checkApiLayer = (layer: any): void => {
   if (!isApiLayer(layer)) {
+    if (!_globalApiLayer) {
+      throw new Error('Global api-layer was not installed.  Please call apiLayerCreate to install');
+    }
     throw new Error('Invalid apiLayer argument.  Was this created with apiLayerCreate?');
   }
 };
@@ -38,6 +37,19 @@ const checkApiLayer = (layer: any): void => {
 const newApiLayerId = (): string => {
   _layerCreateCount++;
   return `${API_LAYER_PREFIX}${_layerCreateCount}`;
+};
+
+export const getGlobalLayer = () => {
+  return _globalApiLayer as ApiLayer;
+};
+
+export const clearGlobalLayer = () => {
+  _globalApiLayer = undefined;
+};
+
+export const getApiUniqueId = (name: string): string => {
+  const id = _uniqueIdCount++;
+  return `${API_UNIQUE_PREFIX}_${id}_${name}`;
 };
 
 /**
@@ -56,62 +68,75 @@ export const isApiLayerFunction = (api: any): boolean => {
  */
 export const apiLayerCreate = (options?: ApiLayerOptions): ApiLayer => {
   const ops = { ...DEFAULT_OPTIONS, ...options };
+  if (ops.mockMode && !ops.mockResolver) {
+    throw new Error('mockResolver must be specified if in mock mode');
+  }
   const newLayer: ApiLayer = {
     layerId: newApiLayerId(),
-    installed: {},
-    overrides: {},
     options: ops,
+    overrides: {},
+    lastCacheClear: 0,
   };
+  if (options?.installGlobal === undefined && _globalApiLayer) {
+    throw new Error(
+      'A previous ApiLayer was already installed globally.  Set installGlobal=true or false if this is expected behavior',
+    );
+  }
+  if (ops.installGlobal) {
+    _globalApiLayer = newLayer;
+  }
   return newLayer;
 };
 
-/**
- * Retrieves an installed API by apiName
- * @param {ApiLayer} apiLayer: The API layer to search
- * @param {string} uniqueId: The unique Id of the api layer function
- * @returns {ApiFunction|undefined} The installed ApiFunction with the given name, or undefined if not found
- */
-export const apiLayerGetApi = (apiLayer: ApiLayer, uniqueId: string): ApiFunction | undefined => {
-  return apiLayer.installed[uniqueId];
-};
+function _getResolver(apiLayer: ApiLayer): any {
+  const type = typeof apiLayer.options.mockResolver;
+  if (type === 'function') {
+    return apiLayer.options.mockResolver;
+  }
+  if (type === 'object' && (apiLayer.options.mockResolver as any).resolve) {
+    return (apiLayer.options.mockResolver as any).resolve;
+  }
+  throw new Error('Invalid api-layer mockResolver option');
+}
 
-const _mockRequire = <T extends Array<any>, U extends any>(mockPath: string, ...args: T): Promise<U> => {
-  return new Promise((resolve) => {
-    let res: any = require(mockPath);
-    if (typeof res === 'function') {
-      res = res(...args);
-      const type = typeof res;
-      // Check to see if the result is a promise
-      if (res && (type === 'function' || type === 'object') && typeof res.then === 'function') {
-        res.then(resolve);
-        return;
-      }
-      resolve(res as U);
-      return;
-    }
-    resolve(res as U);
-  });
-};
-
-const callMock = <T extends Array<any>, U extends any>(
-  apiLayer: ApiLayer,
+export const callMock = <T extends Array<any>, U extends any>(
   api: ApiFunction,
+  apiLayer?: ApiLayer,
+  override?: (...args: T) => Promise<U>,
+  mockDelay?: number,
   ...args: T
 ): Promise<U> => {
-  let callFunction: (...args: T) => Promise<U>;
-  if (apiLayer.options && apiLayer.options.onMockLoad) {
-    callFunction = (): Promise<U> => {
-      return (apiLayer.options.onMockLoad as (api: ApiFunction) => Promise<U>)(api).then((result) => {
-        return result as U;
-      });
-    };
-  } else {
-    callFunction = (): Promise<U> => {
-      return _mockRequire(api.mock, ...args);
-    };
+  const layer = apiLayer || getGlobalLayer();
+  checkApiLayer(layer);
+  if (!layer.options.mockResolver) {
+    return Promise.reject('api-layer is missing the mockResolver function');
   }
-  const delay = apiLayer.options.mockDelay || 0;
+  let callFunction = (...args: T): Promise<U> => {
+    return new Promise((resolve, reject) => {
+      return (_getResolver(layer) as (api: ApiFunction) => Promise<U>)(api)
+        .then((res: any) => {
+          if (typeof res === 'function') {
+            res = res(...args);
+            const type = typeof res;
+            // Check to see if the result is a promise
+            if (res && (type === 'function' || type === 'object') && typeof res.then === 'function') {
+              res.then(resolve);
+              return;
+            }
+          }
+          resolve(res as U);
+        })
+        .catch(reject);
+    });
+  };
+  // Check if we are using an override. If so, we want to use that
+  if (override) {
+    callFunction = override;
+  }
+  let delay = (mockDelay !== undefined ? mockDelay : layer.options.mockDelay) || 0;
   if (delay) {
+    // Add a small amount of fudge to make sure it goes over our delay
+    delay += 4;
     return new Promise<any>((resolve, reject) => {
       const start = Date.now();
       callFunction(...args)
@@ -133,54 +158,47 @@ const callMock = <T extends Array<any>, U extends any>(
         });
     });
   }
-  return callFunction(...args).then((result) => {
-    if (api.apiType === ApiType.Set) {
-      // We need to invalidate all the functions attache to this
-      if (api.invalidates && api.invalidates.length) {
-        api.invalidates.forEach((getApi: ApiFunction) => {
-          if (getApi.clear) {
-            getApi.clear();
-          }
-        });
-      }
-    }
-    return result;
-  });
+  return callFunction(...args);
 };
 
-const callApi = <T extends Array<any>, U extends any>(
-  apiLayer: ApiLayer,
-  uniqueId: string,
-  apiFunction: (...args: T) => Promise<U>,
-  ...args: T
-): Promise<U> => {
-  const api = apiLayerGetApi(apiLayer, uniqueId);
-  if (!api) {
-    throw new Error(`No api found with the uniqueId = ${uniqueId}`);
+export const getApiCallFunction = <T extends Array<any>, U extends any>(
+  api: (...args: T) => Promise<U>,
+  apiFunction: ApiFunction,
+  preventOverride?: boolean,
+  preventMock?: boolean,
+  apiLayer?: ApiLayer,
+): ((...args: T) => Promise<U>) => {
+  let callFunction = api;
+  const layer = apiLayer || getGlobalLayer();
+  checkApiLayer(layer);
+  // If we are using an override, then switch to the override
+  let override = layer.overrides ? layer.overrides[apiFunction.uniqueId] : undefined;
+  if (preventOverride) {
+    override = undefined;
   }
-  let callFunction = apiFunction;
-  if (apiLayer.options.mockMode) {
-    callFunction = (): Promise<U> => {
-      return callMock(apiLayer, api, ...args);
-    };
-  }
-  const override = apiLayer.overrides[uniqueId];
   if (override) {
     callFunction = override;
   }
-  return callFunction(...args).then((result) => {
-    if (api.apiType === ApiType.Set) {
-      // We need to invalidate all the functions attached to this
-      if (api.invalidates && api.invalidates.length) {
-        api.invalidates.forEach((getApi) => {
-          if (getApi.clear) {
-            getApi.clear();
-          }
-        });
-      }
+  // If using mockMode, switch to the mock call.  The mock will also handle the override if its set
+  if (layer.options.mockMode && !preventMock) {
+    callFunction = (...innerArgs: T): Promise<U> => {
+      return callMock(apiFunction, layer, override, undefined, ...innerArgs);
+    };
+  }
+  // Check if this layer has called for a cache clear and we are not in mock mode
+  // If there was a clearance, store the last clearance id in the function and clear the functions cache
+  const lastClear = layer.lastCacheClear;
+  if (!layer.options.mockMode && lastClear) {
+    if (!apiFunction.lastApiCacheClear) {
+      apiFunction.lastApiCacheClear = {};
     }
-    return result;
-  });
+    const apiLastId = apiFunction.lastApiCacheClear[layer.layerId];
+    if (lastClear !== apiLastId) {
+      apiFunction.lastApiCacheClear[layer.layerId] = lastClear;
+      apiFunction.clear();
+    }
+  }
+  return callFunction;
 };
 
 /**
@@ -193,20 +211,17 @@ const callApi = <T extends Array<any>, U extends any>(
 export const apiLayerOverride = <T extends Array<any>, U extends any>(
   apiToOverride: ApiFunction,
   overrideFunction: (...args: T) => Promise<U>,
+  apiLayer?: ApiLayer,
 ): void => {
   if (!apiToOverride || !isApiLayerFunction(apiToOverride)) {
     throw new Error('Invalid arguments');
   }
-  checkApiLayer(apiToOverride.apiLayer);
   if (isApiLayerFunction(overrideFunction)) {
     throw new Error('Do not provide an ApiFunction as the newApi');
   }
-  const apiLayer = apiToOverride.apiLayer as ApiLayer;
-  const current = apiLayer.installed[apiToOverride.uniqueId];
-  if (!current) {
-    throw new Error(`apiToOverride [${apiToOverride.apiName}] does not appear to have been installed previously`);
-  }
-  apiLayer.overrides[apiToOverride.uniqueId] = overrideFunction;
+  const layer: ApiLayer = apiLayer || getGlobalLayer();
+  checkApiLayer(layer);
+  layer.overrides[apiToOverride.uniqueId] = overrideFunction as ApiFunction;
 };
 
 /**
@@ -215,85 +230,24 @@ export const apiLayerOverride = <T extends Array<any>, U extends any>(
  * @param {function} overrideFunction: The installed override
  * @returns void
  */
-export const apiLayerRemoveOverride = <T extends Array<any>, U extends Promise<any>>(
+export const apiLayerRemoveOverride = <T extends Array<any>, U extends any>(
   api: ApiFunction,
-  overrideFunction: (...args: T) => U,
+  overrideFunction: (...args: T) => Promise<U>,
+  apiLayer?: ApiLayer,
 ): void => {
   if (!isApiLayerFunction(api)) {
     throw new Error('Invalid api argument');
   }
-  const apiLayer = api.apiLayer as ApiLayer;
-  checkApiLayer(apiLayer);
-  const current = apiLayer.overrides[api.uniqueId];
-  if (overrideFunction === current) {
-    apiLayer.overrides[api.uniqueId] = undefined;
+  const layer = apiLayer || getGlobalLayer();
+  checkApiLayer(layer);
+  const current = layer.overrides[api.uniqueId];
+  if ((overrideFunction as any) === (current as any)) {
+    layer.overrides[api.uniqueId] = undefined;
     // Clear the cache of the installed api
-    const installed = apiLayer.installed[api.uniqueId];
-    if (installed?.clear) {
-      installed?.clear();
+    if (api.clear) {
+      api.clear();
     }
   }
-};
-
-const getUniqueId = (apiLayer: ApiLayer): string => {
-  _installCount++;
-  return `${apiLayer.layerId}_${_installCount}`;
-};
-
-const clearCache = (func: any) => {
-  const type = typeof func;
-  if ((type === 'function' || type === 'object') && typeof func.clear === 'function') {
-    func.clear();
-  }
-};
-
-/**
- * Installs the specified API function into the given ApiLayer and returns the newly created ApiFunction
- * that can be used instead of directly calling the api function.
- * @param {ApiLayer} apiLayer: The ApiLayer to install the function into
- * @param {string} name: The name to use for the apiName of the function
- * @param {function} api: The api function to call by the wrapper ApiFunction.  This should not be an existing ApiFunction
- * @param {function} mock: The mock version of this function that returns a positive/valid response for testing.  This should not be an existing ApiFunction
- * @param {InstallApiOptions} options: Options for creating the ApiFunction
- * @returns {ApiFunction} The newly created ApiFunction after its installed.
- */
-export const apiLayerInstall = <T extends Array<any>, U extends any>(
-  apiLayer: ApiLayer,
-  name: string,
-  api: (...args: T) => Promise<U>,
-  mock: string,
-  options: InstallApiOptions,
-) => {
-  checkApiLayer(apiLayer);
-  if (typeof api !== 'function' || !mock || !options) {
-    throw new Error('Invalid arguments');
-  }
-  if (isApiLayerFunction(api)) {
-    throw new Error('Do not install an ApiFunction. Just use a regular function');
-  }
-  // Create our new unique api name to ensure it is always unique
-  const uniqueId = getUniqueId(apiLayer);
-  const apiLayerFunc = (...args: T): Promise<U> => {
-    return callApi(apiLayer, uniqueId, api, ...args);
-  };
-  // Add our special members to designate this as an api
-  const additional = {
-    apiName: name,
-    uniqueId,
-    apiType: options.type,
-    invalidates: options.invalidates,
-    mock,
-    clear: () => {},
-    apiLayer,
-  };
-  const newApi = Object.assign(apiLayerFunc, additional);
-  newApi.clear = () => {
-    clearCache(api);
-    clearCache(apiLayer.overrides[uniqueId]);
-  };
-  // Add it to our installed list of apis and then return
-  apiLayer.installed[uniqueId] = newApi;
-  return newApi;
 };
 
 /**
@@ -301,13 +255,10 @@ export const apiLayerInstall = <T extends Array<any>, U extends any>(
  * @param {ApiLayer} apiLayer: The current ApiLayer
  * @returns {void}
  */
-export const apiLayerClearCache = (apiLayer: ApiLayer): void => {
-  Object.values(apiLayer.installed).forEach((api) => {
-    clearCache(api);
-  });
-  Object.values(apiLayer.overrides).forEach((api) => {
-    clearCache(api);
-  });
+export const apiLayerClearCache = (apiLayer?: ApiLayer): void => {
+  const layer = apiLayer || getGlobalLayer();
+  checkApiLayer(apiLayer);
+  layer.lastCacheClear++;
 };
 
 /**
@@ -316,11 +267,12 @@ export const apiLayerClearCache = (apiLayer: ApiLayer): void => {
  * @param {boolean} clearCache: Invalidates all caches.  Default is true
  * @returns {void}
  */
-export const apiLayerClearOverrides = (apiLayer: ApiLayer, clearCache = true): void => {
-  checkApiLayer(apiLayer);
-  apiLayer.overrides = {};
+export const apiLayerClearOverrides = (apiLayer?: ApiLayer, clearCache = true): void => {
+  const layer = apiLayer || getGlobalLayer();
+  checkApiLayer(layer);
+  layer.overrides = {};
   if (clearCache) {
-    apiLayerClearCache(apiLayer);
+    apiLayerClearCache(layer);
   }
 };
 
@@ -332,18 +284,19 @@ export const apiLayerClearOverrides = (apiLayer: ApiLayer, clearCache = true): v
  * @returns {ApiLayOptions} A copy of the options that are installed
  */
 export const apiLayerSetOptions = (
-  apiLayer: ApiLayer,
   options?: ApiLayerOptions,
   clearCache = true,
+  apiLayer?: ApiLayer,
 ): ApiLayerOptions => {
-  checkApiLayer(apiLayer);
+  const layer = apiLayer || getGlobalLayer();
+  checkApiLayer(layer);
   if (!options) {
-    return { ...apiLayer.options };
+    return { ...layer.options };
   }
-  const mockMode = apiLayer.options.mockMode;
-  const ops = Object.assign({}, apiLayer.options, options);
+  const mockMode = layer.options.mockMode;
+  const ops = Object.assign({}, layer.options, options);
   ops.mockMode = mockMode;
-  apiLayer.options = ops;
+  layer.options = ops;
   if (clearCache) {
     apiLayerClearCache(apiLayer);
   }
