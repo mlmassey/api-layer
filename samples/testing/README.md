@@ -2,7 +2,7 @@
 The following sample demonstrates using the ApiLayer for your tests and overriding functionality to test different conditions using the ApiLayer dependency injection.  See the file [sample.test.ts](./sample.test.ts) for the sample code.
 
 # Default mock implementations
-When you create your API functions using [createGetApi](../../src/createGetApi.ts) or [createSetApi]../../src/createSetApi.ts), the ApiLayer requires you to provide the file path to a default mock implementation.  This default implementation should return a positive/valid response that can be used in your application tests/development.  
+When you create your API functions using [createGetApi](../../src/createGetApi.ts) or [createSetApi](../../src/createSetApi.ts), the ApiLayer requires you to provide the file path to a default mock implementation.  This default implementation should return a positive/valid response that can be used in your application tests/development.  
 
 # Creating mock implementations
 ApiLayer provides a helper function called [createMockApi](../../src/createMockApi.ts) that can be used to easily create mock implementations to test different functionality.  
@@ -13,7 +13,7 @@ You can easily override existing API functions using the [overrideApi](../../src
 
 # Using callApiFunction to load different mock results
 The [callApiFunction](../../src/callApiFunction.ts) allows you to call an existing ApiFunction in different ways depending on your needs.  
-For instance, if you want to load a different set of mock results for your ApiFunction, you can set the options.mockPath to callApiFunction
+For instance, if you want to load a different set of mock results for your ApiFunction, you can set the options.mockPath
 to a different path, then install the returned function as an override.
 ```javascript
 import { callApiFunction, overrideApi } from 'api-layer';
@@ -61,9 +61,9 @@ function override() {
 const overrides = new OverrideGroup();
 // Add all your overrides by chaining the requests
 overrides
-  .add(apiGet1, override)
-  .add(apiGet2, override)
-  .add(apiGet3, override);
+  .add(apiGet1, () => Promise.resolve('override1'))
+  .add(apiGet2, () => Promise.resolve('override2'))
+  .add(apiGet3, () => Promise.resolve('override3'));
 // Do your testing work
 // Now remove all the overrides at once
 overrides.removeAll();

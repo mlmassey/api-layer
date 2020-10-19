@@ -4,7 +4,7 @@ This is a small/sample web application that demonstrates how you can run the api
 environment in your project.  In my projects, I would typically using the mocking of the api-layer in my Jest unit tests and
 in [Storybook JS](https://storybook.js.org), so we can test our application components without the need of a 
 back-end.  When running in the web, your application no longer has access to your development file system, so you need
-copy all the mock files to your web server.  This is demonstrated using the `webpack-dev-server` and the `CopyWebpackPlugin`
+copy all the mock files to your web server.  This is demonstrated using the [webpack-dev-server](https://webpack.js.org/configuration/dev-server/) and the [CopyWebpackPlugin](https://webpack.js.org/plugins/copy-webpack-plugin/)
 within the sample [webpack.config.js](./webpack.config.js) provided.
 
 # How to install the sample
@@ -23,5 +23,5 @@ the `CopyWebpackPlugin` in the provided [webpack.config.js](./webpack.config.js)
 set the `rootPath` also.  It defaults to your projects root using `process.cwd`, but the example shows it using the `__dirname`.
 3. *WARNING*: It is important that you don't accidentally run the api-layer with mockMode=true in production and/or copy the mock
 files in production. 
-4. *WARNING2*: It is recommended that you use JSON for your mock responses, rather than Javascript.  Since api-layer uses `eval`, if 
+4. *WARNING2*: It is recommended that you use JSON for your mock responses, rather than Javascript.  Since api-layer uses [eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval), if 
 somehow someone was able to change the mock implementation, it could cause the code to run in your application environment.
