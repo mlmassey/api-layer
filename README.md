@@ -28,7 +28,7 @@ A number of sample implementations have been provided so you can understand how 
 2. [Testing and Overrides](./samples/testing)
 3. [Client-side API caching](./samples/caching)
 4. [Validating API responses](./samples/validation)
-5. [Web Application Usage]('./samples/webapp)
+5. [Web Application Usage](./samples/webapp)
 
 # Typescript Types
 Typescript types can be directly imported from the library. There should be no need to install separate type definitions.
