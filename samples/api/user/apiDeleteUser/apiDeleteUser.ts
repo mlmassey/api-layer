@@ -1,7 +1,7 @@
-import { createSetApi } from '../../../src';
-import { sampleFetch } from '../../sampleFetch';
-import { apiGetUserById } from './apiGetUserById';
-import { apiGetUserIdByUsername } from './apiGetUserIdByUsername';
+import { createSetApi } from '../../../../src';
+import { sampleFetch } from '../../../sampleFetch';
+import { apiGetUserById } from '../apiGetUserById';
+import { apiGetUserIdByUsername } from '../apiGetUserIdByUsername';
 
 // Suggest to declare your API string as a const at the top so your back-end team can quickly modify these and scan the file
 const URL = 'https://api.my-back-end.com/user';
@@ -20,7 +20,7 @@ function deleteUser(id: string): Promise<boolean> {
 // the same type information for arguments and return value as the actual API call.
 // NOTE: We specify which GET api calls will be invalidated by changing this user to clear any cached information
 // that they may have.
-export const apiDeleteUser = createSetApi(deleteUser, 'user/mock/apiDeleteUser.mock.js', [
+export const apiDeleteUser = createSetApi(deleteUser, 'user/apiDeleteUser/apiDeleteUser.mock.js', [
   apiGetUserById,
   apiGetUserIdByUsername,
 ]);

@@ -13,10 +13,12 @@ import {
 /**
  * Creates a new GET API function that wraps your provided API function to allow it be overridden.  This should be only
  * used for functions that retrieve data from your servers (do not set data), such as a REST GET or POST.
- * @param {ApiLayer} apiLayer: The ApiLayer your installing this function into
  * @param {function} apiFunction: Your asynchronous API fetching function.  Should return a Promise.
- * @param {string} mockPath: The full path to the mock data to load for the default mock response.  You should use require.resolve() to resolve the full path
+ * @param {string} mockPath: The path to the mock data to load for the default mock response.  This should be relative to the path set in your MockResolver
+ *    installed in your ApiLayer.
  * @param {string} apiName: (optional) Unique api name you assign to this api.  If not set, it will attempt to use the function name of your api
+ * @param {ApiLayer} apiLayer: (optional) The ApiLayer your installing this function into.  If not defined, the globally installed ApiLayer is used.
+ *    This is typically used for testing purposes only.
  * @returns {ApiFunction} The API function you can call directly, just as you would the apiFunction parameter provided.
  */
 export const createGetApi = <T extends Array<any>, U extends any>(
@@ -52,7 +54,7 @@ export const createGetApi = <T extends Array<any>, U extends any>(
   };
   const apiLayerFunc = (...args: T): Promise<U> => {
     return new Promise((resolve, reject) => {
-      const callFunc = getApiCallFunction(apiFunction, newApi, undefined, undefined, apiLayer);
+      const callFunc = getApiCallFunction(apiFunction, newApi, true, undefined, apiLayer);
       return callFunc(...args)
         .then(resolve)
         .catch(reject);

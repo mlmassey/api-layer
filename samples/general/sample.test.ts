@@ -1,4 +1,4 @@
-import '../api/apiLayer';
+import '../api/testApiLayer';
 import { apiGetUserById, apiGetUserIdByUsername, apiSetUser, apiDeleteUser } from '../api/user';
 
 test('Sample usage of ApiLayer user apis', async () => {

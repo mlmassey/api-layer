@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createGetApi } from '../../../src';
-import { apiLayer } from '../apiLayer';
-import { User } from './User';
+import { createGetApi } from '../../../../src';
+import { User } from '../User';
 
 function getUserById(id: string): Promise<User> {
   // This API is still in development, so we only use the mock version initially and let the back-end team complete this later

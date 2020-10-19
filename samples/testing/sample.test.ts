@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import '../api/apiLayer';
+import '../api/testApiLayer';
 import { apiGetUserById, User } from '../api/user';
-import { createMockApi, overrideApi } from '../../src';
+import { callApiFunction, createMockApi, overrideApi } from '../../src';
 
 // We are going to create 3 sample mock apis to use in our testing to test different conditions
 function mockPositiveResult(id: string): Promise<User> {
@@ -109,4 +109,27 @@ test('Setting a delay on your mock apis', async () => {
   await apiGetUserById('1');
   const finish = Date.now();
   expect(finish - start).toBeGreaterThanOrEqual(1000);
+});
+
+test('Use callApiFunction to alter an existing api', async () => {
+  const override = (id: string) => {
+    return callApiFunction(apiGetUserById)(id).then((user: User) => {
+      // Lets change the users name
+      user.name = 'Override User';
+      return user;
+    });
+  };
+  // We will install this override, which is basically the same as calling the original api, but we get to change the
+  // result before its returned to the caller
+  overrideApi(apiGetUserById, override);
+  const user = await apiGetUserById('1');
+  expect(user.name).toBe('Override User');
+});
+
+test('Loading a different mock result in an override', async () => {
+  // Another typical usage would be to return a different mock result for my api.  This is easily achieved using callApiFunction
+  const override = callApiFunction(apiGetUserById, { mockPath: 'user/apiGetUserById/differentTestUser.mock.js' });
+  overrideApi(apiGetUserById, override);
+  const user = await apiGetUserById('1');
+  expect(user.email).toBe('alternate@test.com');
 });

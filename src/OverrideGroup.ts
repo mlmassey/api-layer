@@ -6,6 +6,10 @@ import { ApiLayer } from '.';
 export class OverrideGroup {
   overrides: { (): void }[];
   apiLayer?: ApiLayer;
+  /**
+   * Creates an Override group that manages a group of overrides
+   * @param {ApiLayer} apiLayer: (optional)  Uses this ApiLayer instead of the global layer.  Typically used for testing purposes only.
+   */
   constructor(apiLayer?: ApiLayer) {
     this.overrides = [];
     this.apiLayer = apiLayer;

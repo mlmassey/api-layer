@@ -3,8 +3,17 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { ApiFunction } from '.';
 
+/**
+ * A mock resolver for a Node application or can be used in Jest/Node testing environment
+ */
 export class NodeMockResolver extends MockResolver {
   rootPath: string;
+  /**
+   * A mock resolver for a Node application or can be used in Jest/Node testing environment
+   * @param {string} rootPath: The root path to use to resolve your mockPath in your APIs to files
+   *  in your Node development environment.  It will use path.resolve(rootPath) to get the full
+   *  path in your file system.  If not set, the default is to use the Node process.cwd().
+   */
   constructor(rootPath?: string) {
     super();
     this.rootPath = rootPath ? path.resolve(rootPath) : process.cwd();

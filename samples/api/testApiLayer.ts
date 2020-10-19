@@ -4,9 +4,12 @@
 //
 import { apiLayerCreate, NodeMockResolver } from '../../src';
 
+// We initialize with a NodeMockResolver for Node/Jest testing.  We use the current dirname
+// as the root that we will resolve all our paths to
 const mockResolver = new NodeMockResolver(__dirname);
 const inJest = process.env.JEST_WORKER_ID !== undefined || process.env.NODE_ENV === 'test';
 const mockMode = inJest;
+
 // You need to call apiLayer create and not export const apiLayer, since it will not actually be called if you don't import it
 const apiLayer = apiLayerCreate({ mockMode, mockResolver });
 

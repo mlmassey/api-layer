@@ -1,4 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+//
+// This sample webpack config shows a very simple web application using webpack
+// This assumes you want mocking when running in development, but want mocking
+// turned off in production.  This is set using the NODE_ENV environment variable
+// which is quite common
+//
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -40,9 +46,15 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({ templateContent }),
+    /*
+     * We will use the CopyWebpackPlugin to copy all our mock files to the correct location
+     * in the webpack-dev-server so they can be found by the WebMockResolver.  This will attempt
+     * to copy all files with *.mock.* to the same folder structure as found under our ./src/api
+     * folder.
+     */
     isDev &&
       new CopyWebpackPlugin({
-        patterns: [{ from: 'src/api/mock', to: 'mock' }],
+        patterns: [{ from: '**/*.mock.*', to: 'mock', context: 'src/api' }],
       }),
   ].filter(Boolean),
   devServer: {

@@ -164,7 +164,7 @@ export const callMock = <T extends Array<any>, U extends any>(
 export const getApiCallFunction = <T extends Array<any>, U extends any>(
   api: (...args: T) => Promise<U>,
   apiFunction: ApiFunction,
-  preventOverride?: boolean,
+  useOverride?: boolean,
   preventMock?: boolean,
   apiLayer?: ApiLayer,
 ): ((...args: T) => Promise<U>) => {
@@ -173,7 +173,7 @@ export const getApiCallFunction = <T extends Array<any>, U extends any>(
   checkApiLayer(layer);
   // If we are using an override, then switch to the override
   let override = layer.overrides ? layer.overrides[apiFunction.uniqueId] : undefined;
-  if (preventOverride) {
+  if (!useOverride) {
     override = undefined;
   }
   if (override) {

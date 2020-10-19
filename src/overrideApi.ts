@@ -7,6 +7,8 @@ import { ApiFunction } from './types/ApiFunction';
  * dependency injection when performing testing.
  * @param {ApiFunction} apiToOverride: The ApiFunction that was installed that you want to override
  * @param {function} overrideFunction: The new function you want to be called instead.
+ * @param {ApiLayer} apiLayer: (optional) The optional ApiLayer to install this override into. If not specified, the globally installed ApiLayer will
+ *    be used.  This is typically only used for testing purposes.
  * @returns {function} Returns a function that can be called to remove the installed override
  */
 export const overrideApi = <T extends Array<any>, U extends any>(

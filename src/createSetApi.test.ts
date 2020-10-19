@@ -2,8 +2,8 @@
 import { createSetApi, apiLayerCreate, isApiLayerFunction, createGetApi, NodeMockResolver } from './index';
 
 const resolver = new NodeMockResolver();
-const MOCK_FUNCTION = 'samples/api/mock/mockModuleExports.js';
-const MOCK_RESULT = 'samples/api/mock/mockComplex.json';
+const MOCK_FUNCTION = 'samples/mock/mockModuleExports.js';
+const MOCK_RESULT = 'samples/mock/mockComplex.json';
 
 function stringSucks(input: string): Promise<string> {
   const result = `${input} sucks`;

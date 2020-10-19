@@ -12,7 +12,7 @@ import {
 import { getGlobalLayer, clearGlobalLayer } from './ApiLayerCommon';
 
 const resolver = new NodeMockResolver();
-const MOCK_RESULT = 'samples/api/mock/mockModuleExports.js';
+const MOCK_RESULT = 'samples/mock/mockModuleExports.js';
 
 function stringSucks(input: string): Promise<string> {
   const result = `${input} sucks`;

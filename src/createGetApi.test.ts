@@ -2,8 +2,8 @@
 import { createGetApi, apiLayerCreate, isApiLayerFunction, NodeMockResolver } from './index';
 
 const resolver = new NodeMockResolver();
-const MOCK_FUNCTION = 'samples/api/mock/mockModuleExports.js';
-const MOCK_JSON = 'samples/api/mock/mockComplex.json';
+const MOCK_FUNCTION = 'samples/mock/mockModuleExports.js';
+const MOCK_JSON = 'samples/mock/mockComplex.json';
 
 function stringSucks(input: string): Promise<string> {
   const result = `${input} sucks`;
@@ -27,42 +27,42 @@ test('Default behavior with production', async () => {
 
 test('Setting function name works correctly', async () => {
   const original = 'test';
-  const api = createGetApi(stringSucks, 'samples/api/mock/mockModuleExports.js', 'my name', mockLayer);
+  const api = createGetApi(stringSucks, 'samples/mock/mockModuleExports.js', 'my name', mockLayer);
   expect(isApiLayerFunction(api)).toBeTruthy();
   expect(api.apiName).toBe('my name');
 });
 
 test('Mock response with module exports', async () => {
   let original = 'test';
-  const api = createGetApi(stringSucks, 'samples/api/mock/mockModuleExports.js', undefined, mockLayer);
+  const api = createGetApi(stringSucks, 'samples/mock/mockModuleExports.js', undefined, mockLayer);
   original = await api(original);
   expect(original).toBe('test mock');
 });
 
 test('Mock response with multiple module exports', async () => {
   let original = 'test';
-  const api = createGetApi(stringSucks, 'samples/api/mock/mockMultiModuleExport.js', undefined, mockLayer);
+  const api = createGetApi(stringSucks, 'samples/mock/mockMultiModuleExport.js', undefined, mockLayer);
   original = await api(original);
   expect(typeof original).toBe('object');
 });
 
 test('Mock response with simple json response', async () => {
   let original = 'test';
-  const api = createGetApi(stringSucks, 'samples/api/mock/mockSimple.json', undefined, mockLayer);
+  const api = createGetApi(stringSucks, 'samples/mock/mockSimple.json', undefined, mockLayer);
   original = await api(original);
   expect(original).toBe('mock test sucks');
 });
 
 test('Mock response with complex json response', async () => {
   let original = 'test';
-  const api = createGetApi(stringSucks, 'samples/api/mock/mockComplex.json', undefined, mockLayer);
+  const api = createGetApi(stringSucks, 'samples/mock/mockComplex.json', undefined, mockLayer);
   original = await api(original);
   expect(typeof original).toBe('object');
 });
 
 test('Mock response with promise response', async () => {
   let original = 'test';
-  const api = createGetApi(stringSucks, 'samples/api/mock/mockPromiseExport.js', undefined, mockLayer);
+  const api = createGetApi(stringSucks, 'samples/mock/mockPromiseExport.js', undefined, mockLayer);
   original = await api(original);
   expect(original).toBe('test mock promise');
 });

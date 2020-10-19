@@ -15,12 +15,14 @@ import {
  * Creates a new SET API function that wraps your provided API function to allow it be overridden.  This should be
  * used for functions that send data to your servers, such as a REST PUT/POST/DELETE.  You need to make sure to provide
  * a list of any ApiFunction that retrieves the same data that this function sets to ensure their cache is invalidated.
- * @param {ApiLayer} apiLayer: The ApiLayer your installing this function into
  * @param {function} apiFunction: Your asynchronous API setting function.  Should return a Promise.
- * @param {string} mockPath: The full path to the mock data to load for the default mock response.  You should use require.resolve() to resolve the full path
- * @param {Array<ApiFunction>} invalidates: An array of ApiFunctions this SET API would invalidate once the data is sent. Even if you're not
+ * @param {string} mockPath: The path to the mock data to load for the default mock response.  This should be relative to the path set in your MockResolver
+ *    installed in your ApiLayer.
+ * @param {Array<ApiFunction>} invalidates: (optional) An array of ApiFunctions this SET API would invalidate once the data is sent. Even if you're not
  *  using client-side caching, it is good to set these to build a relationship between APIs that work on related data.
  * @param {string} apiName: (optional) Provide a name to identify this api with.  The resulting function has its apiName member set with this
+ * @param {ApiLayer} apiLayer: (optional) The ApiLayer your installing this function into.  If not set, the globally installed ApiLayer is used.  This
+ *    is typically used only for testing purposes.
  * @returns {ApiFunction} The API function you can call directly, just as you would the apiFunction parameter provided.
  */
 export const createSetApi = <T extends Array<any>, U extends any>(
@@ -63,7 +65,7 @@ export const createSetApi = <T extends Array<any>, U extends any>(
   };
   const apiLayerFunc = (...args: T): Promise<U> => {
     return new Promise((resolve, reject) => {
-      const callFunc = getApiCallFunction(apiFunction, newApi, undefined, undefined, apiLayer);
+      const callFunc = getApiCallFunction(apiFunction, newApi, true, undefined, apiLayer);
       callFunc(...args)
         .then((result: any) => {
           // We need to invalidate all the apis that are specified to this function
