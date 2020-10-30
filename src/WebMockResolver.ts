@@ -45,10 +45,10 @@ export class WebMockResolver extends MockResolver {
     this.resolve = this.resolve.bind(this);
   }
   resolve(api: ApiFunction): Promise<any> {
-    if (!api.mockPath) {
-      return Promise.reject(new Error('ApiFunction has empty mockPath'));
+    if (typeof api.mock !== 'string') {
+      return Promise.reject(new Error('ApiFunction has invalid mockPath'));
     }
-    const filename = resolvePath(this.rootPath, api.mockPath);
+    const filename = resolvePath(this.rootPath, api.mock);
     if (typeof fetch === undefined) {
       return Promise.reject(new Error('WebMockResolver requires fetch polyfill'));
     }
