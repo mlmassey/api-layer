@@ -7,7 +7,7 @@ export interface ApiFunction {
   /** The original wrapped function */
   original: (...args: any) => Promise<any>;
   /** Path to mock data or mock data identifier */
-  mockPath: string;
+  mock: string | ((...args: any) => Promise<any>);
   /** Unique string identifier for the api function */
   uniqueId: string;
   /** The friendly name of the api function */

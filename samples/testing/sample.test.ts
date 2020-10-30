@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import '../api/testApiLayer';
 import { apiGetUserById, User } from '../api/user';
-import { callApiFunction, createMockApi, overrideApi } from '../../src';
+import { callApiFunction, createMockApi, getMockResult, overrideApi } from '../../src';
 
 // We are going to create 3 sample mock apis to use in our testing to test different conditions
 function mockPositiveResult(id: string): Promise<User> {
@@ -45,7 +45,7 @@ test('Using createMockApi and overrideApi', async () => {
 });
 
 test('Negative test case', () => {
-  // Now we want to override the API to return a different result in our test case
+  // Now we want to override the API to return a negative result in our test case
   overrideApi(apiGetUserById, mockNegativeResult);
   // Call our api function again to see if it is now returning the new override value
   return apiGetUserById('1').catch((error: string) => {
@@ -54,9 +54,8 @@ test('Negative test case', () => {
 });
 
 test('Using a callback function in your mock api', async () => {
-  // Now we want to override the API to return a different result in our test case
   overrideApi(apiGetUserById, mockCallback);
-  // Call our api function again to see if it is now returning the new override value
+  // Call our api function again to see if it is now returning the new overridden value
   const user = await apiGetUserById('1');
   expect(user.id).toBe('callback_user');
   expect(currentUser.id).toBe('callback_user');
@@ -131,5 +130,24 @@ test('Loading a different mock result in an override', async () => {
   const override = callApiFunction(apiGetUserById, { mockPath: 'user/apiGetUserById/differentTestUser.mock.js' });
   overrideApi(apiGetUserById, override);
   const user = await apiGetUserById('1');
+  expect(user.email).toBe('alternate@test.com');
+});
+
+test('Using getMockResult to load different JSON results', async () => {
+  // Another typical usage would be to have a different set of results based on the argument provided to the API function
+  // The getMockResult helper function helps load different mock results
+  const override = (id: string): Promise<User> => {
+    let mockPath = 'user/apiGetUserById/apiGetUserById.mock.js';
+    if (id !== '1') {
+      mockPath = 'user/apiGetUserById/differentTestUser.mock.js';
+    }
+    return getMockResult(mockPath).then((res: any) => {
+      return res(id);
+    });
+  };
+  overrideApi(apiGetUserById, override);
+  let user = await apiGetUserById('1');
+  expect(user.email).toBe('test@test.com');
+  user = await apiGetUserById('alternate');
   expect(user.email).toBe('alternate@test.com');
 });

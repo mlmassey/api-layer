@@ -14,8 +14,8 @@ import {
  * Creates a new GET API function that wraps your provided API function to allow it be overridden.  This should be only
  * used for functions that retrieve data from your servers (do not set data), such as a REST GET or POST.
  * @param {function} apiFunction: Your asynchronous API fetching function.  Should return a Promise.
- * @param {string} mockPath: The path to the mock data to load for the default mock response.  This should be relative to the path set in your MockResolver
- *    installed in your ApiLayer.
+ * @param {string} mock: The path to the mock data to load for the default mock response.  This should be relative to the path set in your MockResolver
+ *    installed in your ApiLayer.  You can also provide a function, but note that this code will be present in your production build.
  * @param {string} apiName: (optional) Unique api name you assign to this api.  If not set, it will attempt to use the function name of your api
  * @param {ApiLayer} apiLayer: (optional) The ApiLayer your installing this function into.  If not defined, the globally installed ApiLayer is used.
  *    This is typically used for testing purposes only.
@@ -23,7 +23,7 @@ import {
  */
 export const createGetApi = <T extends Array<any>, U extends any>(
   apiFunction: (...args: T) => Promise<U>,
-  mockPath: string,
+  mock: string | ((...args: T) => Promise<U>),
   apiName?: string,
   apiLayer?: ApiLayer,
 ) => {
@@ -33,7 +33,7 @@ export const createGetApi = <T extends Array<any>, U extends any>(
   if (isApiLayerFunction(apiFunction)) {
     throw new Error('apiFunction cannot be an existing ApiFunction');
   }
-  if (!mockPath) {
+  if (!mock) {
     throw new Error(
       'It is required that you provide the path to the mock implementation.  This mock should return a typical/positive result',
     );
@@ -66,7 +66,7 @@ export const createGetApi = <T extends Array<any>, U extends any>(
     uniqueId,
     apiType: ApiType.Get,
     invalidates: [],
-    mockPath,
+    mock,
     clear,
     override,
     clearOverride,

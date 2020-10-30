@@ -43,6 +43,10 @@ with the current MockResolvers provided.
 *WARNING*: It is highly recommended to not use Javascript mock implementations, since its not secure.  The MockResolver provided uses
 `eval` to parse the Javascript data, which is a very easy way to inject malicious code into your application.  
 
+### Using functions for mock
+You can also provide a function for your mock (instead of a string path).  This is provided in case you want to do some processing before
+returning a mock result.  This method is not recommended though because the mock code will be bundled in your final code (even though it is useless and never used). 
+
 ## Create your SET APIs
 `SET` APIs are very similar to `GET` APIs.  The only real difference is cache invalidation case you are using client-side caching with your ApiLayer.  For an example of this, see the sample.  See the sample [apiSetUser.ts](../api/user/apiSetUser/apiSetUser.ts) on how to create your `SET` APIs and create the relationship with the `GET` APIs that are dependent on the same information.  Even if you're not using caching,
 its a good idea to create the dependency between your SET/GET APIs using the `invalidates` parameter, so its clear to developers and you 

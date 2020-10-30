@@ -16,8 +16,8 @@ import {
  * used for functions that send data to your servers, such as a REST PUT/POST/DELETE.  You need to make sure to provide
  * a list of any ApiFunction that retrieves the same data that this function sets to ensure their cache is invalidated.
  * @param {function} apiFunction: Your asynchronous API setting function.  Should return a Promise.
- * @param {string} mockPath: The path to the mock data to load for the default mock response.  This should be relative to the path set in your MockResolver
- *    installed in your ApiLayer.
+ * @param {string} mock: The path to the mock data to load for the default mock response.  This should be relative to the path set in your MockResolver
+ *    installed in your ApiLayer.  You can also provide a function, but note that this code will be present in your production build.
  * @param {Array<ApiFunction>} invalidates: (optional) An array of ApiFunctions this SET API would invalidate once the data is sent. Even if you're not
  *  using client-side caching, it is good to set these to build a relationship between APIs that work on related data.
  * @param {string} apiName: (optional) Provide a name to identify this api with.  The resulting function has its apiName member set with this
@@ -27,7 +27,7 @@ import {
  */
 export const createSetApi = <T extends Array<any>, U extends any>(
   apiFunction: (...args: T) => Promise<U>,
-  mockPath: string,
+  mock: string | ((...args: T) => Promise<U>),
   invalidates?: ApiFunction | Array<ApiFunction> | undefined,
   apiName?: string,
   apiLayer?: ApiLayer,
@@ -38,7 +38,7 @@ export const createSetApi = <T extends Array<any>, U extends any>(
   if (isApiLayerFunction(apiFunction)) {
     throw new Error('apiFunction cannot be an existing ApiFunction');
   }
-  if (!mockPath) {
+  if (!mock) {
     throw new Error(
       'It is required that you provide the path to the mock implementation.  This mock should return a typical/positive result',
     );
@@ -88,7 +88,7 @@ export const createSetApi = <T extends Array<any>, U extends any>(
     uniqueId,
     apiType: ApiType.Set,
     invalidates: invalids,
-    mockPath,
+    mock,
     clear,
     override,
     clearOverride,

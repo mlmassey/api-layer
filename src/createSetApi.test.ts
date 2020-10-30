@@ -90,3 +90,12 @@ test('Api invalidation when set is working', async () => {
   await setApi('test');
   expect(result).toBe('clear');
 });
+
+test('Using a function for mock', async () => {
+  const mock = () => {
+    return Promise.resolve('callback mock');
+  };
+  const api = createSetApi(stringSucks, mock, undefined, undefined, mockLayer);
+  const result = await api('test');
+  expect(result).toBe('callback mock');
+});

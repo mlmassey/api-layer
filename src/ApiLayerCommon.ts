@@ -104,6 +104,7 @@ export const callMock = <T extends Array<any>, U extends any>(
   apiLayer?: ApiLayer,
   override?: (...args: T) => Promise<U>,
   mockDelay?: number,
+  returnResult?: boolean,
   ...args: T
 ): Promise<U> => {
   const layer = apiLayer || getGlobalLayer();
@@ -113,9 +114,18 @@ export const callMock = <T extends Array<any>, U extends any>(
   }
   let callFunction = (...args: T): Promise<U> => {
     return new Promise((resolve, reject) => {
+      // Check if our mock is a function.  If so, call it with the args and then return
+      if (typeof api.mock === 'function') {
+        api
+          .mock(...args)
+          .then(resolve)
+          .catch(reject);
+        return;
+      }
+      // Mock is a path to a result, so resolve it
       return (_getResolver(layer) as (api: ApiFunction) => Promise<U>)(api)
         .then((res: any) => {
-          if (typeof res === 'function') {
+          if (typeof res === 'function' && !returnResult) {
             res = res(...args);
             const type = typeof res;
             // Check to see if the result is a promise
@@ -182,7 +192,7 @@ export const getApiCallFunction = <T extends Array<any>, U extends any>(
   // If using mockMode, switch to the mock call.  The mock will also handle the override if its set
   if (layer.options.mockMode && !preventMock) {
     callFunction = (...innerArgs: T): Promise<U> => {
-      return callMock(apiFunction, layer, override, undefined, ...innerArgs);
+      return callMock(apiFunction, layer, override, undefined, false, ...innerArgs);
     };
   }
   // Check if this layer has called for a cache clear and we are not in mock mode

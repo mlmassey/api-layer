@@ -111,3 +111,12 @@ test('Invalid mock path throws an error', async () => {
   const getApi = createGetApi(stringSucks, 'invalid path', undefined, mockLayer);
   expect(getApi('hello')).rejects.toBeTruthy();
 });
+
+test('Using a function for mock', async () => {
+  const mock = () => {
+    return Promise.resolve('callback mock');
+  };
+  const api = createGetApi(stringSucks, mock, undefined, mockLayer);
+  const result = await api('test');
+  expect(result).toBe('callback mock');
+});

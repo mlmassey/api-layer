@@ -21,7 +21,11 @@ export class NodeMockResolver extends MockResolver {
   }
   resolve(api: ApiFunction): Promise<any> {
     return new Promise((resolve, reject) => {
-      const mockPath = api.mockPath;
+      const mockPath = api.mock as string;
+      if (!mockPath || typeof mockPath !== 'string') {
+        reject(new Error('Invalid mockPath is not a string'));
+        return;
+      }
       const filename = this.rootPath ? path.resolve(this.rootPath, mockPath) : mockPath;
       const callback = (err: NodeJS.ErrnoException | null, data: string) => {
         if (err) {

@@ -43,7 +43,7 @@ export const callApiFunction = <T extends Array<any>, U extends any>(
         if (ops.preventMock) {
           throw new Error('Using preventMock with a mockPath does not make sense');
         }
-        newApiFunction.mockPath = ops.mockPath;
+        newApiFunction.mock = ops.mockPath;
       }
       const callFunc = getApiCallFunction(
         newApiFunction.original,
