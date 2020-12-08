@@ -94,7 +94,5 @@
       "git add"
     ]
   },
-  "dependencies": {
-    "caller-dirname": "^2.0.0"
-  }
+  "dependencies": {}
 }
