@@ -9,6 +9,7 @@ import {
   getApiUniqueId,
   isApiLayerFunction,
 } from './ApiLayerCommon';
+import { ApiFunction } from '.';
 
 /**
  * Creates a new GET API function that wraps your provided API function to allow it be overridden.  This should be only
@@ -26,7 +27,7 @@ export const createGetApi = <T extends Array<any>, U extends any>(
   mock: string | ((...args: T) => Promise<U>),
   apiName?: string,
   apiLayer?: ApiLayer,
-) => {
+): ApiFunction<T, U> => {
   if (!apiFunction) {
     throw new Error('Invalid empty arguments');
   }

@@ -30,13 +30,13 @@ test('Calling mock result with valid json and delay adds delay', async () => {
 
 test('Calling mock result with a javascript result is a function', async () => {
   const apiLayer = apiLayerCreate({ installGlobal: false, mockResolver });
-  const result = await getMockResult('samples/mock/mockModuleExports.js', 0, apiLayer);
+  const result = await getMockResult<(arg: string) => string>('samples/mock/mockModuleExports.js', 0, apiLayer);
   expect(typeof result).toBe('function');
   expect(result('test')).toBe('test mock');
 });
 
 test('Validate ApiFunction when calling resolver in getMockResult', async () => {
-  const resolver = (api: ApiFunction): Promise<any> => {
+  const resolver = (api: ApiFunction<any, any>): Promise<any> => {
     expect(api.apiName).toBe(MOCK_RESULT_NAME);
     expect(api.uniqueId).toBe(MOCK_RESULT_UNIQUE_ID);
     return Promise.resolve('result');

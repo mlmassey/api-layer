@@ -28,17 +28,7 @@ export interface CallApiFunctionOptions {
  *  you wrap this function with another function that you can then alter the results or arguments when calling this return value.
  */
 export const callApiFunction = <T extends Array<any>, U extends any>(
-  apiFunction: ((...args: T) => Promise<U>) & {
-    apiName: string;
-    uniqueId: string;
-    apiType: ApiType;
-    invalidates: never[];
-    mock: string | ((...args: T) => Promise<U>);
-    clear: () => void;
-    override: (overrideFunc: (...args: T) => Promise<U>) => void;
-    clearOverride: (overrideFunc: (...args: T) => Promise<U>) => void;
-    original: (...args: T) => Promise<U>;
-  },
+  apiFunction: ApiFunction<T, U>,
   options?: CallApiFunctionOptions,
   apiLayer?: ApiLayer,
 ): ((...args: T) => Promise<U>) => {

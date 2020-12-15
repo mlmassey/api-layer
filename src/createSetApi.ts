@@ -31,7 +31,7 @@ export const createSetApi = <T extends Array<any>, U extends any>(
   invalidates?: ApiFunction<any, any> | Array<ApiFunction<any, any>> | undefined,
   apiName?: string,
   apiLayer?: ApiLayer,
-) => {
+): ApiFunction<T, U> => {
   if (!apiFunction) {
     throw new Error('Invalid empty arguments');
   }

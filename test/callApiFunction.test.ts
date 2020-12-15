@@ -1,4 +1,4 @@
-import { apiLayerCreate, callApiFunction, NodeMockResolver, createGetApi, createSetApi } from '../src';
+import { apiLayerCreate, callApiFunction, NodeMockResolver, createGetApi, createSetApi, overrideApi } from '../src';
 import { apiLayerOverride, apiLayerRemoveOverride } from '../src/ApiLayerCommon';
 
 const mockResolver = new NodeMockResolver();
@@ -29,10 +29,10 @@ test('Create call api with preventMock option should call original', async () =>
 test('Create call api with useOverride set to false ignores installed override', async () => {
   const apiLayer = apiLayerCreate({ mockMode: true, installGlobal: false, mockResolver });
   const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', undefined, apiLayer);
-  const override = () => {
+  const override = (arg: string) => {
     return Promise.resolve('override');
   };
-  apiLayerOverride(api, override, apiLayer);
+  overrideApi(api, override, apiLayer);
   const result = await api('hello');
   expect(result).toBe('override');
   // Now lets create our call api function that prevents calling of override
@@ -82,7 +82,7 @@ test('Create call api with preventInvalidation works', async () => {
 test('Install call api as an override to allow manipulation of inputs+outputs', async () => {
   const apiLayer = apiLayerCreate({ mockMode: false, installGlobal: false, mockResolver });
   const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', undefined, apiLayer);
-  const override = () => {
+  const override = (arg: string) => {
     return Promise.resolve('override');
   };
   apiLayerOverride(api, override, apiLayer);

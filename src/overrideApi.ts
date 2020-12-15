@@ -15,7 +15,7 @@ export const overrideApi = <T extends Array<any>, U extends any>(
   apiToOverride: ApiFunction<T, U>,
   overrideFunction: (...args: T) => Promise<U>,
   apiLayer?: ApiLayer,
-) => {
+): (() => void) => {
   apiLayerOverride(apiToOverride, overrideFunction, apiLayer);
   return () => {
     apiLayerRemoveOverride(apiToOverride, overrideFunction, apiLayer);
