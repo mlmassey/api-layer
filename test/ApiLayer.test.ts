@@ -8,8 +8,8 @@ import {
   apiLayerClearCache,
   createSetApi,
   NodeMockResolver,
-} from './index';
-import { getGlobalLayer, clearGlobalLayer } from './ApiLayerCommon';
+} from '../src/index';
+import { getGlobalLayer, clearGlobalLayer } from '../src/ApiLayerCommon';
 
 const resolver = new NodeMockResolver();
 const MOCK_RESULT = 'samples/mock/mockModuleExports.js';

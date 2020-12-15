@@ -1,5 +1,5 @@
-import { apiLayerCreate, createGetApi } from '.';
-import { NodeMockResolver } from './NodeMockResolver';
+import { apiLayerCreate, createGetApi } from '../src';
+import { NodeMockResolver } from '../src/NodeMockResolver';
 
 const apiLayer = apiLayerCreate({ installGlobal: false });
 const apiFunction = (): Promise<void> => {

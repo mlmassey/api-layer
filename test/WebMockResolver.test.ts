@@ -1,4 +1,4 @@
-import { resolvePath } from './WebMockResolver';
+import { resolvePath } from '../src/WebMockResolver';
 
 test('resolvePath with no root tests', () => {
   expect(resolvePath('', '/test')).toBe('/test');

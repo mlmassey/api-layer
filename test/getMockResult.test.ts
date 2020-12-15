@@ -5,7 +5,7 @@ import {
   NodeMockResolver,
   MOCK_RESULT_UNIQUE_ID,
   MOCK_RESULT_NAME,
-} from '.';
+} from '../src';
 
 const mockResolver = new NodeMockResolver();
 

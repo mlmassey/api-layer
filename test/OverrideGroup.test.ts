@@ -1,4 +1,4 @@
-import { OverrideGroup, apiLayerCreate, createGetApi } from './index';
+import { OverrideGroup, apiLayerCreate, createGetApi } from '../src/index';
 
 const MOCK_RESULT = 'samples/api/mock/mockSimple.json';
 
