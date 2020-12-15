@@ -23,9 +23,9 @@ function getUserById(id: string): Promise<User> {
 function mockGetUserById(id: string): Promise<User> {
   // For this mock, if the user id === "1", we return one value, otherwise we return a different value
   if (id === '1') {
-    return getMockResult('user/apiGetUserById/apiGetUserById.mock.js').then((res) => res(id));
+    return getMockResult('user/apiGetUserById/apiGetUserById.mock.js').then((res: any) => res(id));
   }
-  return getMockResult('user/apiGetUserById/differentTestUser.mock.js').then((res) => res(id));
+  return getMockResult('user/apiGetUserById/differentTestUser.mock.js').then((res: any) => res(id));
 }
 
 // Now we create our api using api-layer's createGetApi, since this api is a GET REST call and retrieves information
