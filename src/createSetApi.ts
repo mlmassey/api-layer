@@ -28,7 +28,7 @@ import {
 export const createSetApi = <T extends Array<any>, U extends any>(
   apiFunction: (...args: T) => Promise<U>,
   mock: string | ((...args: T) => Promise<U>),
-  invalidates?: ApiFunction | Array<ApiFunction> | undefined,
+  invalidates?: ApiFunction<any, any> | Array<ApiFunction<any, any>> | undefined,
   apiName?: string,
   apiLayer?: ApiLayer,
 ) => {
@@ -50,7 +50,7 @@ export const createSetApi = <T extends Array<any>, U extends any>(
   if ((type === 'function' || type === 'object') && typeof (apiFunction as any).clear === 'function') {
     clear = (apiFunction as any).clear;
   }
-  let invalids: Array<ApiFunction> = [];
+  let invalids: Array<ApiFunction<any, any>> = [];
   if (Array.isArray(invalidates)) {
     invalids = invalids.concat(invalidates);
   } else if (invalidates) {
@@ -64,13 +64,23 @@ export const createSetApi = <T extends Array<any>, U extends any>(
     apiLayerRemoveOverride(newApi, overrideFunc, apiLayer);
   };
   const apiLayerFunc = (...args: T): Promise<U> => {
-    return new Promise((resolve, reject) => {
+    let cancel: () => any;
+    const newPromise = new Promise<U>((resolve, reject) => {
       const callFunc = getApiCallFunction(apiFunction, newApi, true, undefined, apiLayer);
-      callFunc(...args)
+      const res = callFunc(...args);
+      // We need to check if the resulting promise has a cancel function.  If it does, then
+      // we want to allow our outer promise to call this cancel function when cancel is
+      // called on it
+      if (res && typeof (res as any).cancel === 'function') {
+        cancel = (res as any).cancel as () => any;
+      }
+      // We have to call res.then.catch after we check for the cancel we will not see the
+      // promises cancel function
+      res
         .then((result: any) => {
           // We need to invalidate all the apis that are specified to this function
           if (invalids && invalids.length) {
-            invalids.forEach((getApi: ApiFunction) => {
+            invalids.forEach((getApi: ApiFunction<any, any>) => {
               if (getApi.clear) {
                 getApi.clear();
               }
@@ -81,6 +91,12 @@ export const createSetApi = <T extends Array<any>, U extends any>(
         .then(resolve)
         .catch(reject);
     });
+    (newPromise as any).cancel = () => {
+      if (cancel) {
+        return cancel();
+      }
+    };
+    return newPromise;
   };
   // Add our special members to designate this as an api
   const additional = {

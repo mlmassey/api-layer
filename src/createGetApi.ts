@@ -53,12 +53,27 @@ export const createGetApi = <T extends Array<any>, U extends any>(
     apiLayerRemoveOverride(newApi, overrideFunc, apiLayer);
   };
   const apiLayerFunc = (...args: T): Promise<U> => {
-    return new Promise((resolve, reject) => {
+    let cancel: () => any;
+    const newPromise = new Promise<U>((resolve, reject) => {
       const callFunc = getApiCallFunction(apiFunction, newApi, true, undefined, apiLayer);
-      return callFunc(...args)
-        .then(resolve)
-        .catch(reject);
+      const res = callFunc(...args);
+      // We need to check if the resulting promise has a cancel function.  If it does, then
+      // we want to allow our outer promise to call this cancel function when cancel is
+      // called on it
+      if (res && typeof (res as any).cancel === 'function') {
+        cancel = (res as any).cancel as () => any;
+      }
+      // We have to call res.then.catch after we check for the cancel we will not see the
+      // promises cancel function
+      res.then(resolve).catch(reject);
+      return res;
     });
+    (newPromise as any).cancel = () => {
+      if (cancel) {
+        return cancel();
+      }
+    };
+    return newPromise;
   };
   // Add our special members to designate this as an api
   const additional = {
