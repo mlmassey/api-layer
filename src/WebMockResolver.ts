@@ -44,7 +44,7 @@ export class WebMockResolver extends MockResolver {
     this.rootPath = rootPath === undefined ? '/' : rootPath;
     this.resolve = this.resolve.bind(this);
   }
-  resolve(api: ApiFunction): Promise<any> {
+  resolve(api: ApiFunction<any, any>): Promise<any> {
     if (typeof api.mock !== 'string') {
       return Promise.reject(new Error('ApiFunction has invalid mockPath'));
     }

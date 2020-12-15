@@ -27,7 +27,7 @@ export const createMockApi = <T extends Array<any>, U extends any>(
             .catch(reject);
           return;
         }
-        resolve(result);
+        resolve(result as U);
       };
       if (delay && delay > 0) {
         setTimeout(() => {

@@ -10,14 +10,14 @@ export const MOCK_RESULT_NAME = 'getMockResult';
  * @param {number} mockDelay: (optional) Additional delay (in milliseconds) to add to the call to simulate a real api call
  * @param {ApiLayer} apiLayer: (optional) Used primarily for testing purposes
  */
-export const getMockResult = (mockPath: string, mockDelay?: number, apiLayer?: ApiLayer): Promise<any> => {
+export const getMockResult = <U extends any>(mockPath: string, mockDelay?: number, apiLayer?: ApiLayer): Promise<U> => {
   return new Promise((resolve, reject) => {
     const apiFunction = {
       uniqueId: MOCK_RESULT_UNIQUE_ID,
       apiName: MOCK_RESULT_NAME,
       mock: mockPath,
     };
-    callMock(apiFunction as ApiFunction, apiLayer, undefined, mockDelay, true)
+    callMock(apiFunction as ApiFunction<any, U>, apiLayer, undefined, mockDelay, true)
       .then(resolve)
       .catch(reject);
   });

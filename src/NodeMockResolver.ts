@@ -19,7 +19,7 @@ export class NodeMockResolver extends MockResolver {
     this.rootPath = rootPath ? path.resolve(rootPath) : process.cwd();
     this.resolve = this.resolve.bind(this);
   }
-  resolve(api: ApiFunction): Promise<any> {
+  resolve(api: ApiFunction<any, any>): Promise<any> {
     return new Promise((resolve, reject) => {
       const mockPath = api.mock as string;
       if (!mockPath || typeof mockPath !== 'string') {

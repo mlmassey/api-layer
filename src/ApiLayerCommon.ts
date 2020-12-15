@@ -100,7 +100,7 @@ function _getResolver(apiLayer: ApiLayer): any {
 }
 
 export const callMock = <T extends Array<any>, U extends any>(
-  api: ApiFunction,
+  api: ApiFunction<T, U>,
   apiLayer?: ApiLayer,
   override?: (...args: T) => Promise<U>,
   mockDelay?: number,
@@ -123,7 +123,7 @@ export const callMock = <T extends Array<any>, U extends any>(
         return;
       }
       // Mock is a path to a result, so resolve it
-      return (_getResolver(layer) as (api: ApiFunction) => Promise<U>)(api)
+      return (_getResolver(layer) as (api: ApiFunction<T, U>) => Promise<U>)(api)
         .then((res: any) => {
           if (typeof res === 'function' && !returnResult) {
             res = res(...args);
@@ -173,7 +173,7 @@ export const callMock = <T extends Array<any>, U extends any>(
 
 export const getApiCallFunction = <T extends Array<any>, U extends any>(
   api: (...args: T) => Promise<U>,
-  apiFunction: ApiFunction,
+  apiFunction: ApiFunction<T, U>,
   useOverride?: boolean,
   preventMock?: boolean,
   apiLayer?: ApiLayer,
@@ -219,7 +219,7 @@ export const getApiCallFunction = <T extends Array<any>, U extends any>(
  * @returns {void}
  */
 export const apiLayerOverride = <T extends Array<any>, U extends any>(
-  apiToOverride: ApiFunction,
+  apiToOverride: ApiFunction<T, U>,
   overrideFunction: (...args: T) => Promise<U>,
   apiLayer?: ApiLayer,
 ): void => {
@@ -231,7 +231,7 @@ export const apiLayerOverride = <T extends Array<any>, U extends any>(
   }
   const layer: ApiLayer = apiLayer || getGlobalLayer();
   checkApiLayer(layer);
-  layer.overrides[apiToOverride.uniqueId] = overrideFunction as ApiFunction;
+  layer.overrides[apiToOverride.uniqueId] = overrideFunction as ApiFunction<T, U>;
 };
 
 /**
@@ -241,7 +241,7 @@ export const apiLayerOverride = <T extends Array<any>, U extends any>(
  * @returns void
  */
 export const apiLayerRemoveOverride = <T extends Array<any>, U extends any>(
-  api: ApiFunction,
+  api: ApiFunction<T, U>,
   overrideFunction: (...args: T) => Promise<U>,
   apiLayer?: ApiLayer,
 ): void => {

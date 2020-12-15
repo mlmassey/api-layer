@@ -12,7 +12,7 @@ import { ApiFunction } from './types/ApiFunction';
  * @returns {function} Returns a function that can be called to remove the installed override
  */
 export const overrideApi = <T extends Array<any>, U extends any>(
-  apiToOverride: ApiFunction,
+  apiToOverride: ApiFunction<T, U>,
   overrideFunction: (...args: T) => Promise<U>,
   apiLayer?: ApiLayer,
 ) => {

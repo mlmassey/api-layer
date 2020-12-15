@@ -82,12 +82,12 @@ export class MockResolver {
   /**
    * This is the resolve function that is called by the api-layer.  Its purpose is to resolve an ApiFunction
    * definition to a string of data to be used by the mock call.
-   * @param {ApiFuntion} api: The ApiFunction to resolve to its mock data
+   * @param {ApiFunction} api: The ApiFunction to resolve to its mock data
    * @returns {any} The returned value should be either a string of data or a javascript function that can be called
    *    If the mockPath has a JSON extension, it attempts to covert the string data to a Javascript object before
    *    returning.
    */
-  resolve(api: ApiFunction): Promise<any> {
+  resolve(api: ApiFunction<any, any>): Promise<any> {
     throw new Error('This should be overridden by the parent class');
   }
   /**

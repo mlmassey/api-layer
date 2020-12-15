@@ -38,7 +38,7 @@ export class OverrideGroup {
       throw new Error('Invalid empty overrideFunc');
     }
     // We assume this is an ApiFunction and we are adding it
-    const remove = overrideApi(apiOrHandle as ApiFunction, overrideFunc, this.apiLayer);
+    const remove = overrideApi(apiOrHandle as ApiFunction<any, any>, overrideFunc, this.apiLayer);
     this.overrides.push(remove);
     return this;
   }

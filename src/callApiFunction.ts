@@ -28,7 +28,17 @@ export interface CallApiFunctionOptions {
  *  you wrap this function with another function that you can then alter the results or arguments when calling this return value.
  */
 export const callApiFunction = <T extends Array<any>, U extends any>(
-  apiFunction: ApiFunction,
+  apiFunction: ((...args: T) => Promise<U>) & {
+    apiName: string;
+    uniqueId: string;
+    apiType: ApiType;
+    invalidates: never[];
+    mock: string | ((...args: T) => Promise<U>);
+    clear: () => void;
+    override: (overrideFunc: (...args: T) => Promise<U>) => void;
+    clearOverride: (overrideFunc: (...args: T) => Promise<U>) => void;
+    original: (...args: T) => Promise<U>;
+  },
   options?: CallApiFunctionOptions,
   apiLayer?: ApiLayer,
 ): ((...args: T) => Promise<U>) => {
@@ -38,7 +48,7 @@ export const callApiFunction = <T extends Array<any>, U extends any>(
   const ops: CallApiFunctionOptions = options || {};
   const newFunc = (...args: T): Promise<U> => {
     return new Promise((resolve, reject) => {
-      const newApiFunction = { ...apiFunction };
+      const newApiFunction = ({ ...apiFunction } as unknown) as ApiFunction<T, U>;
       if (ops.mockPath) {
         if (ops.preventMock) {
           throw new Error('Using preventMock with a mockPath does not make sense');
@@ -47,7 +57,7 @@ export const callApiFunction = <T extends Array<any>, U extends any>(
       }
       const callFunc = getApiCallFunction(
         newApiFunction.original,
-        newApiFunction as ApiFunction,
+        newApiFunction,
         ops.useOverride,
         ops.preventMock,
         apiLayer,
@@ -60,7 +70,7 @@ export const callApiFunction = <T extends Array<any>, U extends any>(
           // We need to invalidate all the apis that are specified to this function
           const invalids = apiFunction.invalidates || [];
           if (invalids && invalids.length) {
-            invalids.forEach((getApi: ApiFunction) => {
+            invalids.forEach((getApi: ApiFunction<T, U>) => {
               if (getApi.clear) {
                 getApi.clear();
               }
