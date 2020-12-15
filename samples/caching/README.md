@@ -14,16 +14,12 @@ function getSampleData(): Promise<object> {
   return fetch('https://api.my-back-end.com/data').then(response => response.json());
 }
 
-function mockGetSampleData(): Promise<object> {
-  return Promise.resolve({ myData: true });
-}
-
 // Set our cache age to one hour, since that is about how frequently the data changes on our server
 const cacheOptions = {
   maxAge: 1000 * 60 * 60,  // Set cache age to 1 hour 
 }
 
-export default createGetApi(apiLayer, memoize(getSampleData, cacheOptions), memoize(mockGetSampleData, cacheOptions));
+export default createGetApi(memoize(getSampleData, cacheOptions), '/mock.result.json');
 ```
 
 ## Make your SET api invalidate related GET functions
@@ -40,12 +36,8 @@ function setSampleData(value: object): Promise<object> {
   return fetch('https://api.my-back-end.com/data', { method: 'PUT', body: JSON.stringify(value) }).then(response => response.json());
 }
 
-function mockSetSampleData(value: object): Promise<object> {
-  return Promise.resolve(value);
-}
-
 // Make sure to list the apiGetSampleData as a related function in your SET API
-export default createSetApi(apiLayer, setSampleData, mockSetSampleData, [apiGetSampleData]));
+export default createSetApi(setSampleData, '/mock.set.result.json', [apiGetSampleData]));
 ```
 
 ## Using a different memoization library

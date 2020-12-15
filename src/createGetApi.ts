@@ -73,6 +73,9 @@ export const createGetApi = <T extends Array<any>, U extends any>(
     original: apiFunction,
   };
   const result = Object.assign(apiLayerFunc, additional);
+  if (apiName) {
+    Object.defineProperty(result, 'name', { value: apiName });
+  }
   newApi = result;
   return result;
 };
