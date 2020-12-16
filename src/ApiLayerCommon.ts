@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { ApiLayerOptions, ApiLayer } from './types/ApiLayer';
 import { ApiFunction } from './types/ApiFunction';
 

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 /**
  * This utility function creates a mock API implementation for testing purposes.  It is not required to be used, but provided
  * as a helper.
@@ -13,7 +15,7 @@ export const createMockApi = <T extends Array<any>, U extends any>(
   failure?: any,
   callback?: (...args: T) => Promise<U>,
   delay?: number,
-) => {
+): ((...args: T) => Promise<U>) => {
   const apiFunc = (...args: T): Promise<U> => {
     return new Promise<U>((resolve, reject) => {
       const returnResult = () => {

@@ -2,7 +2,6 @@ import { MockResolver } from '..';
 import { ApiFunction } from './ApiFunction';
 
 type ApiFunctionMap = Record<string, ApiFunction<any, any> | undefined>;
-type ApiOverrideMap = Record<string, any>;
 
 /**
  * Options when creating an ApiLayer

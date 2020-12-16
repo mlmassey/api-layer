@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { isApiLayerFunction } from './ApiLayerCommon';
 import { ApiFunction } from './types/ApiFunction';
 import { overrideApi } from './overrideApi';
@@ -45,7 +46,7 @@ export class OverrideGroup {
   /**
    * Removes all the overrides that are part of this group
    */
-  removeAll() {
+  removeAll(): void {
     (this.overrides || []).forEach((removeOverride) => {
       removeOverride();
     });
