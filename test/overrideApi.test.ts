@@ -20,7 +20,7 @@ function overrideFunc2(input: string): Promise<string> {
 }
 
 test('Creating an api override works', async () => {
-  const getApi = createGetApi(stringSucks, MOCK_RESULT, undefined, apiLayer);
+  const getApi = createGetApi(stringSucks, MOCK_RESULT, { apiLayer });
   overrideApi(getApi, overrideFunc, apiLayer);
   const result = await getApi('test');
   expect(result).toEqual('test override');
@@ -34,20 +34,20 @@ test('Passing in a non-api function throws an error', async () => {
 });
 
 test('Passing in an api function throws an error', async () => {
-  const getApi = createGetApi(stringSucks, MOCK_RESULT, undefined, apiLayer);
+  const getApi = createGetApi(stringSucks, MOCK_RESULT, { apiLayer });
   expect(() => overrideApi(getApi, getApi, apiLayer)).toThrowError();
 });
 
 test('Setting to mock mode for overrides still returns the same value', async () => {
   const mockLayer = apiLayerCreate({ mockMode: true, mockResolver, installGlobal: false });
-  const getApi = createGetApi(stringSucks, MOCK_RESULT, undefined, mockLayer);
+  const getApi = createGetApi(stringSucks, MOCK_RESULT, { apiLayer: mockLayer });
   overrideApi(getApi, overrideFunc, mockLayer);
   const result = await getApi('test');
   expect(result).toEqual('test override');
 });
 
 test('Creating multiple mocks overrides the previous', async () => {
-  const getApi = createGetApi(stringSucks, MOCK_RESULT, undefined, apiLayer);
+  const getApi = createGetApi(stringSucks, MOCK_RESULT, { apiLayer });
   overrideApi(getApi, overrideFunc, apiLayer);
   overrideApi(getApi, overrideFunc2, apiLayer);
   const result = await getApi('test');
@@ -55,7 +55,7 @@ test('Creating multiple mocks overrides the previous', async () => {
 });
 
 test('Removing an override works ok', async () => {
-  const getApi = createGetApi(stringSucks, MOCK_RESULT, undefined, apiLayer);
+  const getApi = createGetApi(stringSucks, MOCK_RESULT, { apiLayer });
   const removeOverride = overrideApi(getApi, overrideFunc, apiLayer);
   removeOverride();
   const result = await getApi('test');
@@ -63,7 +63,7 @@ test('Removing an override works ok', async () => {
 });
 
 test('Removing an override does nothing if already removed', async () => {
-  const getApi = createGetApi(stringSucks, MOCK_RESULT, undefined, apiLayer);
+  const getApi = createGetApi(stringSucks, MOCK_RESULT, { apiLayer });
   const removeOverride = overrideApi(getApi, overrideFunc, apiLayer);
   const override2 = overrideApi(getApi, overrideFunc2, apiLayer);
   removeOverride();

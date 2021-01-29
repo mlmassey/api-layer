@@ -7,12 +7,12 @@ const apiLayer = apiLayerCreate({ mockMode: false, installGlobal: false });
 function get1() {
   return Promise.resolve('get1');
 }
-const apiGet1 = createGetApi(get1, MOCK_RESULT, undefined, apiLayer);
+const apiGet1 = createGetApi(get1, MOCK_RESULT, { apiLayer });
 
 function get2() {
   return Promise.resolve('get2');
 }
-const apiGet2 = createGetApi(get2, MOCK_RESULT, undefined, apiLayer);
+const apiGet2 = createGetApi(get2, MOCK_RESULT, { apiLayer });
 
 function override1() {
   return Promise.resolve('override1');

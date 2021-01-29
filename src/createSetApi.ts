@@ -10,6 +10,14 @@ import {
   getApiUniqueId,
   isApiLayerFunction,
 } from './ApiLayerCommon';
+import { CreateGetApiOptions } from './createGetApi';
+
+export interface CreateSetApiOptions {
+  /** The name to use for the api instead of the default */
+  apiName?: string;
+  /** The apiLayer to attach this to.  This is not typically used (primarily for unit testing purposes) */
+  apiLayer?: ApiLayer;
+}
 
 /**
  * Creates a new SET API function that wraps your provided API function to allow it be overridden.  This should be
@@ -20,17 +28,14 @@ import {
  *    installed in your ApiLayer.  You can also provide a function, but note that this code will be present in your production build.
  * @param {Array<ApiFunction>} invalidates: (optional) An array of ApiFunctions this SET API would invalidate once the data is sent. Even if you're not
  *  using client-side caching, it is good to set these to build a relationship between APIs that work on related data.
- * @param {string} apiName: (optional) Provide a name to identify this api with.  The resulting function has its apiName member set with this
- * @param {ApiLayer} apiLayer: (optional) The ApiLayer your installing this function into.  If not set, the globally installed ApiLayer is used.  This
- *    is typically used only for testing purposes.
+ * @param {CreateSetApiOptions} options: (optional) Additional options.  See CreateSetApiOptions for details
  * @returns {ApiFunction} The API function you can call directly, just as you would the apiFunction parameter provided.
  */
 export const createSetApi = <T extends Array<any>, U extends any>(
   apiFunction: (...args: T) => Promise<U>,
   mock: string | ((...args: T) => Promise<U>),
   invalidates?: ApiFunction<any, any> | Array<ApiFunction<any, any>> | undefined,
-  apiName?: string,
-  apiLayer?: ApiLayer,
+  options?: CreateSetApiOptions,
 ): ApiFunction<T, U> => {
   if (!apiFunction) {
     throw new Error('Invalid empty arguments');
@@ -43,7 +48,8 @@ export const createSetApi = <T extends Array<any>, U extends any>(
       'It is required that you provide the path to the mock implementation.  This mock should return a typical/positive result',
     );
   }
-  const name = apiName || apiFunction.name || '';
+  const ops = options || {};
+  const name = ops.apiName || apiFunction.name || '';
   const uniqueId = getApiUniqueId(name);
   let clear: () => void = () => {};
   const type = typeof apiFunction;
@@ -58,15 +64,15 @@ export const createSetApi = <T extends Array<any>, U extends any>(
   }
   let newApi: any;
   const override = (overrideFunc: (...args: T) => Promise<U>) => {
-    apiLayerOverride(newApi, overrideFunc, apiLayer);
+    apiLayerOverride(newApi, overrideFunc, ops.apiLayer);
   };
   const clearOverride = (overrideFunc: (...args: T) => Promise<U>) => {
-    apiLayerRemoveOverride(newApi, overrideFunc, apiLayer);
+    apiLayerRemoveOverride(newApi, overrideFunc, ops.apiLayer);
   };
   const apiLayerFunc = (...args: T): Promise<U> => {
     let cancel: () => any;
     const newPromise = new Promise<U>((resolve, reject) => {
-      const callFunc = getApiCallFunction(apiFunction, newApi, true, undefined, apiLayer);
+      const callFunc = getApiCallFunction(apiFunction, newApi, true, undefined, ops.apiLayer);
       const res = callFunc(...args);
       // We need to check if the resulting promise has a cancel function.  If it does, then
       // we want to allow our outer promise to call this cancel function when cancel is
@@ -111,8 +117,8 @@ export const createSetApi = <T extends Array<any>, U extends any>(
     original: apiFunction,
   };
   const result = Object.assign(apiLayerFunc, additional);
-  if (apiName) {
-    Object.defineProperty(result, 'name', { value: apiName });
+  if (ops.apiName) {
+    Object.defineProperty(result, 'name', { value: ops.apiName });
   }
   newApi = result;
   return result;

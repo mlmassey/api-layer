@@ -33,7 +33,7 @@ test('ApiLayer change mock delay', async () => {
     installGlobal: false,
   };
   const apiLayer = apiLayerCreate(options);
-  const getApi = createGetApi(stringSucks, MOCK_RESULT, undefined, apiLayer);
+  const getApi = createGetApi(stringSucks, MOCK_RESULT, { apiLayer });
   let start = Date.now();
   await getApi('hello');
   let finish = Date.now();
@@ -49,7 +49,7 @@ test('ApiLayer change mock delay', async () => {
 
 test('isApiLayerFunction working properly', () => {
   const apiLayer = apiLayerCreate({ installGlobal: false });
-  const getApi = createGetApi(stringSucks, MOCK_RESULT, undefined, apiLayer);
+  const getApi = createGetApi(stringSucks, MOCK_RESULT, { apiLayer });
   expect(isApiLayerFunction(getApi)).toBe(true);
   const test = () => {
     return Promise.resolve('test');
@@ -127,21 +127,21 @@ test('Clear the ApiLayer cache works for all getApis', async () => {
   get1Func.clear = () => {
     result += ' get1';
   };
-  const get1 = createGetApi(get1Func, MOCK_RESULT, undefined, apiLayer);
+  const get1 = createGetApi(get1Func, MOCK_RESULT, { apiLayer });
   const get2Func = (value: string) => {
     return Promise.resolve(`${value} get2`);
   };
   get2Func.clear = () => {
     result += ' get2';
   };
-  const get2 = createGetApi(get2Func, MOCK_RESULT, undefined, apiLayer);
+  const get2 = createGetApi(get2Func, MOCK_RESULT, { apiLayer });
   const set1Func = (value: string) => {
     return Promise.resolve(`${value} set1`);
   };
   set1Func.clear = () => {
     result += ' set1';
   };
-  const set1 = createSetApi(stringSucks, MOCK_RESULT, [], undefined, apiLayer);
+  const set1 = createSetApi(stringSucks, MOCK_RESULT, [], { apiLayer });
   apiLayerClearCache(apiLayer);
   await get1('hello');
   await get2('hello');

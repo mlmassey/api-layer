@@ -9,26 +9,26 @@ const sampleGet = (value: string): Promise<string> => {
 
 test('Create call api with empty options should have original result', async () => {
   const apiLayer = apiLayerCreate({ installGlobal: false, mockResolver });
-  const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', undefined, apiLayer);
-  const call = callApiFunction(api, undefined, apiLayer);
+  const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', { apiLayer });
+  const call = callApiFunction(api, { apiLayer });
   const result = await call('hello');
   expect(result).toBe('sample hello');
 });
 
 test('Create call api with preventMock option should call original', async () => {
   const apiLayer = apiLayerCreate({ mockMode: true, installGlobal: false, mockResolver });
-  const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', undefined, apiLayer);
+  const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', { apiLayer });
   const result = await api('hello');
   expect(result).toBe('mock test sucks');
   // Now lets create our call api function that ignores mock result
-  const call = callApiFunction(api, { preventMock: true }, apiLayer);
+  const call = callApiFunction(api, { preventMock: true, apiLayer });
   const callResult = await call('hello');
   expect(callResult).toBe('sample hello');
 });
 
 test('Create call api with useOverride set to false ignores installed override', async () => {
   const apiLayer = apiLayerCreate({ mockMode: true, installGlobal: false, mockResolver });
-  const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', undefined, apiLayer);
+  const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', { apiLayer });
   const override = (arg: string) => {
     return Promise.resolve('override');
   };
@@ -36,18 +36,18 @@ test('Create call api with useOverride set to false ignores installed override',
   const result = await api('hello');
   expect(result).toBe('override');
   // Now lets create our call api function that prevents calling of override
-  const call = callApiFunction(api, { useOverride: false, preventMock: true }, apiLayer);
+  const call = callApiFunction(api, { useOverride: false, preventMock: true, apiLayer });
   const callResult = await call('hello');
   expect(callResult).toBe('sample hello');
 });
 
 test('Create call api with an alternate mockPath loads the different result', async () => {
   const apiLayer = apiLayerCreate({ mockMode: true, installGlobal: false, mockResolver });
-  const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', undefined, apiLayer);
+  const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', { apiLayer });
   const result = await api('hello');
   expect(result).toBe('mock test sucks');
   // Now lets create our call api function that loads a different mock result
-  const call = callApiFunction(api, { mockPath: 'samples/mock/mockComplex.json' }, apiLayer);
+  const call = callApiFunction(api, { mockPath: 'samples/mock/mockComplex.json', apiLayer });
   const callResult: any = await call('hello');
   expect(typeof callResult).toBe('object');
   expect(callResult.field1).toBeTruthy();
@@ -62,26 +62,26 @@ test('Create call api with preventInvalidation works', async () => {
   sampleGetApi.clear = () => {
     cacheCleared = true;
   };
-  const getApi = createGetApi(sampleGetApi, 'samples/mock/mockSimple.json', undefined, apiLayer);
-  const setApi = createSetApi(sampleGet, 'samples/mock/mockSimple.json', [getApi], undefined, apiLayer);
+  const getApi = createGetApi(sampleGetApi, 'samples/mock/mockSimple.json', { apiLayer });
+  const setApi = createSetApi(sampleGet, 'samples/mock/mockSimple.json', [getApi], { apiLayer });
   await setApi('hello');
   expect(cacheCleared).toBeTruthy();
   // Now lets create our call api function that prevents invalidation
   cacheCleared = false; // reset our variable
   // Create a call api that does perform invalidation
-  const callInvalidates = callApiFunction(setApi, { preventInvalidation: false }, apiLayer);
+  const callInvalidates = callApiFunction(setApi, { preventInvalidation: false, apiLayer });
   await callInvalidates('hello');
   expect(cacheCleared).toBeTruthy();
   // Lets create one that does not perform invalidation
   cacheCleared = false;
-  const callNoInvalidates = callApiFunction(setApi, { preventInvalidation: true }, apiLayer);
+  const callNoInvalidates = callApiFunction(setApi, { preventInvalidation: true, apiLayer });
   await callNoInvalidates('hello');
   expect(cacheCleared).toBeFalsy();
 });
 
 test('Install call api as an override to allow manipulation of inputs+outputs', async () => {
   const apiLayer = apiLayerCreate({ mockMode: false, installGlobal: false, mockResolver });
-  const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', undefined, apiLayer);
+  const api = createGetApi(sampleGet, 'samples/mock/mockSimple.json', { apiLayer });
   const override = (arg: string) => {
     return Promise.resolve('override');
   };
@@ -89,7 +89,7 @@ test('Install call api as an override to allow manipulation of inputs+outputs', 
   const result = await api('hello');
   expect(result).toBe('override');
   // Now lets create our call api function that will act as a new override
-  const call = callApiFunction(api, { preventMock: true }, apiLayer);
+  const call = callApiFunction(api, { preventMock: true, apiLayer });
   const callResult = await call('hello');
   expect(callResult).toBe('sample hello');
   // Now wrap the call with our own manipulator function

@@ -7,8 +7,8 @@ import {
   apiLayerSetOptions,
 } from './ApiLayerCommon';
 import { ApiLayer, ApiLayerOptions } from './types/ApiLayer';
-import { createGetApi } from './createGetApi';
-import { createSetApi } from './createSetApi';
+import { createGetApi, CreateGetApiOptions } from './createGetApi';
+import { createSetApi, CreateSetApiOptions } from './createSetApi';
 import { createMockApi } from './createMockApi';
 import { overrideApi } from './overrideApi';
 import { ApiFunction } from './types/ApiFunction';
@@ -44,4 +44,6 @@ export {
   ApiLayerOptions,
   ApiFunction,
   ApiType,
+  CreateGetApiOptions,
+  CreateSetApiOptions,
 };
