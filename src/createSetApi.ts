@@ -10,7 +10,6 @@ import {
   getApiUniqueId,
   isApiLayerFunction,
 } from './ApiLayerCommon';
-import { CreateGetApiOptions } from './createGetApi';
 
 export interface CreateSetApiOptions {
   /** The name to use for the api instead of the default */
