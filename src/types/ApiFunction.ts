@@ -24,4 +24,6 @@ export interface ApiFunction<T extends Array<any>, U extends any> {
   clearOverride: (overrideFunc: (...args: T) => Promise<U>) => void;
   /** Last apiLayer cache clear identifier */
   lastApiCacheClear?: any;
+  /** The cache age of this function (if applicable) in milliseconds */
+  cacheAge?: number;
 }
