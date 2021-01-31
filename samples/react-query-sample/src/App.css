@@ -1,0 +1,94 @@
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+table {
+  border: 1px solid grey;
+  border-collapse: collapse;
+  vertical-align: middle;
+}
+
+th {
+  border: 1px solid grey;
+  padding: 5px 20px;
+}
+
+td {
+  border: 1px solid grey;
+  padding: 5px 20px;
+}
+
+input {
+  max-width: 100px;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  margin-top: 20px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.footer > * {
+  margin: 5px 20px;
+}
+
+.updated {
+  color: grey;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.query-cache-info {
+  min-width: 300px;
+  border: 1px solid black;
+  margin: 20px;
+  display: flex;
+  padding: 5px 20px;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  color: grey;
+}
+
+.query-cache-info .title {
+  font-size: 14px;
+  color: grey;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.dog-filters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid black;
+  min-width: 200px;
+}
+
+.dog-filters .title {
+  font-weight: bold;
+}
+
+.dog-filters .filter {
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
+  align-items: center;
+  justify-content: center;
+}
+.dog-filters .filter > label {
+  margin-right: 5px;
+}
+
+.dog-filters  > button {
+  max-width: 150px;
+}

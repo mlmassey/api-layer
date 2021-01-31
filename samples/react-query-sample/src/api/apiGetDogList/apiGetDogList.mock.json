@@ -1,0 +1,23 @@
+{
+  "list": [
+    {
+      "id": "1",
+      "count": 1,
+      "breed": "Labrador",
+      "color": "Brown"
+    },
+    {
+      "id": "2",
+      "count": 20,
+      "breed": "Poodle",
+      "color": "Pink"
+    },
+    {
+      "id": "3",
+      "count": 0,
+      "breed": "Shepard",
+      "color": "Black"
+    }
+  ],
+  "updated": "2020-03-25T12:00:00Z"
+}

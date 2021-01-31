@@ -29,7 +29,8 @@ A number of sample implementations have been provided so you can understand how 
 3. [Client-side API caching](./samples/caching)
 4. [Validating API responses](./samples/validation)
 5. [Web Application Usage](./samples/webapp)
-
+## React Query Sample
+[React Query](https://react-query.tanstack.com/) is an excellent library for managing your asynchronous API calls in your application.  Its conceptually aligned with api-layer and the two work seamlessly together to work with your BE and manage the API cache.  Take a look at the sample for more details.  [React Query Sample](./samples/react-query-sample)
 # Typescript Types
 Typescript types can be directly imported from the library. There should be no need to install separate type definitions.
 

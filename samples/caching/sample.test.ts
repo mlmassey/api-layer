@@ -38,7 +38,9 @@ const memoizedGet = memoize(getApi, cacheOptions);
 // Create our api-layer functions, but wrap our actual API calls with memoize
 // The memoized functions attach an additional function to our API function called clear() that is used to clear the cache.
 // If your memoization library does not add a clear() function, you will have to add it yourself manually
-const apiSampleGet = createGetApi(memoizedGet, 'mock is never called so this is ignored');
+const apiSampleGet = createGetApi(memoizedGet, 'mock is never called so this is ignored', {
+  cacheAge: cacheOptions.maxAge,
+});
 // Create our set api function and make sure to tell it that it will invalidate our get API if it is called using the invalidates argument
 const apiSampleSet = createSetApi(setApi, 'mock is never called so this is ignored', [apiSampleGet]);
 
