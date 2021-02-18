@@ -16,7 +16,7 @@ are not considered fully tested and usable.  That said, feel free to use them.
 
 1. [useGetApi](./hooks/useGetApi.ts): Wraps the [useQuery](https://react-query.tanstack.com/reference/useQuery) api and
 allows you to specify the api-layer GET function to use.
-2. [useSetApi])./hooks/useSetApi.ts): Wraps the [useMutation](https://react-query.tanstack.com/reference/useMutation) and
+2. [useSetApi](./hooks/useSetApi.ts): Wraps the [useMutation](https://react-query.tanstack.com/reference/useMutation) and
 will automatically invalidate the associated GET APIs in the onSuccess function.
 
 ## How to run the sample

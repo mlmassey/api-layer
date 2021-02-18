@@ -15,8 +15,6 @@ import { ApiFunction } from './types/ApiFunction';
 import { ApiType } from './types/ApiType';
 import { OverrideGroup } from './OverrideGroup';
 import { MockResolver } from './MockResolver';
-import { NodeMockResolver } from './NodeMockResolver';
-import { WebMockResolver } from './WebMockResolver';
 import { callApiFunction, CallApiFunctionOptions } from './callApiFunction';
 import { getMockResult, MOCK_RESULT_UNIQUE_ID, MOCK_RESULT_NAME } from './getMockResult';
 
@@ -37,8 +35,6 @@ export {
   MOCK_RESULT_UNIQUE_ID,
   CallApiFunctionOptions,
   MockResolver,
-  NodeMockResolver,
-  WebMockResolver,
   OverrideGroup,
   ApiLayer,
   ApiLayerOptions,
