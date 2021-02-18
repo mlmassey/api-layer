@@ -2,7 +2,8 @@
 // Your global ApiLayer needs to be initialized in mock mode when running in a unit test environment
 // This examples shows how to initialize with mock mode on when it detects Jest
 //
-import { apiLayerCreate, NodeMockResolver } from '../../src';
+import { apiLayerCreate } from '../../src';
+import { NodeMockResolver } from '../../src/NodeMockResolver';
 
 // We initialize with a NodeMockResolver for Node/Jest testing.  We use the current dirname
 // as the root that we will resolve all our paths to

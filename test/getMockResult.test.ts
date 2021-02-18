@@ -1,11 +1,5 @@
-import {
-  ApiFunction,
-  apiLayerCreate,
-  getMockResult,
-  NodeMockResolver,
-  MOCK_RESULT_UNIQUE_ID,
-  MOCK_RESULT_NAME,
-} from '../src';
+import { ApiFunction, apiLayerCreate, getMockResult, MOCK_RESULT_UNIQUE_ID, MOCK_RESULT_NAME } from '../src';
+import { NodeMockResolver } from '../src/NodeMockResolver';
 
 const mockResolver = new NodeMockResolver();
 

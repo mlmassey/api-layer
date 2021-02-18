@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { apiLayerCreate, overrideApi, createGetApi, NodeMockResolver } from '../src/index';
+import { apiLayerCreate, overrideApi, createGetApi } from '../src/index';
+import { NodeMockResolver } from '../src/NodeMockResolver';
 
 const mockResolver = new NodeMockResolver();
 const MOCK_RESULT = 'samples/api/mock/mockSimple.json';

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createSetApi, apiLayerCreate, isApiLayerFunction, createGetApi, NodeMockResolver } from '../src/index';
+import { createSetApi, apiLayerCreate, isApiLayerFunction, createGetApi } from '../src/index';
+import { NodeMockResolver } from '../src/NodeMockResolver';
 
 const resolver = new NodeMockResolver();
 const MOCK_FUNCTION = 'samples/mock/mockModuleExports.js';

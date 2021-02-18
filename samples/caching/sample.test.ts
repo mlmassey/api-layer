@@ -1,7 +1,8 @@
 /* eslint-disable import/default */
 /* eslint-disable import/no-extraneous-dependencies */
 import memoize from 'memoizee';
-import { apiLayerCreate, createGetApi, createSetApi, overrideApi, NodeMockResolver } from '../../src';
+import { apiLayerCreate, createGetApi, createSetApi, overrideApi } from '../../src';
+import { NodeMockResolver } from '../../src/NodeMockResolver';
 
 // Create a global variable that will store our testing value
 let testValue = '';

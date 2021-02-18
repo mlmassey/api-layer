@@ -7,8 +7,8 @@ import {
   apiLayerSetOptions,
   apiLayerClearCache,
   createSetApi,
-  NodeMockResolver,
-} from '../src/index';
+} from '../src/';
+import { NodeMockResolver } from '../src/NodeMockResolver';
 import { getGlobalLayer, clearGlobalLayer } from '../src/ApiLayerCommon';
 
 const resolver = new NodeMockResolver();

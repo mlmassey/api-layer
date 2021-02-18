@@ -1,4 +1,5 @@
-import { apiLayerCreate, callApiFunction, NodeMockResolver, createGetApi, createSetApi, overrideApi } from '../src';
+import { apiLayerCreate, callApiFunction, createGetApi, createSetApi, overrideApi } from '../src';
+import { NodeMockResolver } from '../src/NodeMockResolver';
 import { apiLayerOverride, apiLayerRemoveOverride } from '../src/ApiLayerCommon';
 
 const mockResolver = new NodeMockResolver();

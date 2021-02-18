@@ -1,7 +1,8 @@
 /* eslint-disable import/default */
 /* eslint-disable import/no-extraneous-dependencies */
 import Ajv from 'ajv';
-import { apiLayerCreate, createGetApi, NodeMockResolver } from '../../src';
+import { apiLayerCreate, createGetApi } from '../../src';
+import { NodeMockResolver } from '../../src/NodeMockResolver';
 
 // Create the global api layer in production mode
 const mockResolver = new NodeMockResolver();
