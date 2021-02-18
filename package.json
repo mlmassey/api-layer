@@ -1,6 +1,6 @@
 {
   "name": "api-layer",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Asynchronous API organization library",
   "type": "module",
   "main": "./lib/cjs/index.js",
@@ -93,6 +93,5 @@
       "eslint --fix",
       "git add"
     ]
-  },
-  "dependencies": {}
+  }
 }
