@@ -1,6 +1,6 @@
 {
   "name": "api-layer",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "description": "Asynchronous API organization library",
   "type": "module",
   "main": "./lib/cjs/index.js",
