@@ -4,6 +4,7 @@ import { ApiType } from './types/ApiType';
 import { ApiFunction } from './types/ApiFunction';
 import { isApiLayerFunction } from './isApiLayerFunction';
 import { getApiUniqueId } from './getApiUniqueId';
+import { registerFunction } from './registeredFunctions';
 
 export interface CreateSetApiOptions {
   /** The name to use for the api instead of the default */
@@ -120,5 +121,6 @@ export const createSetApi = <T extends Array<any>, U extends any>(
     Object.defineProperty(result, 'name', { value: ops.apiName });
   }
   newApi = result;
+  registerFunction(result);
   return result;
 };
