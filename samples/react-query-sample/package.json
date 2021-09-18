@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
-    "api-layer": "^1.5.5",
+    "api-layer": "^2.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-query": "^3.2.0",
