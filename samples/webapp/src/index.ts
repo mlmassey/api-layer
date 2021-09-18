@@ -1,6 +1,5 @@
 import { apiGetSample } from './api/apiGetSample';
 import { apiSetSample } from './api/apiSetSample';
-import './api/apiLayer';
 
 function setSample() {
   console.log('Executing apiSetSample...');

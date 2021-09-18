@@ -5,4 +5,4 @@ function setSample(): Promise<string> {
   return Promise.resolve('Production setSample response');
 }
 
-export const apiSetSample = createSetApi(setSample, 'apiSetSample/apiSetSample.mock.json', [apiGetSample]);
+export const apiSetSample = createSetApi(setSample, [apiGetSample]);

@@ -1,16 +1,11 @@
 /* eslint-disable import/default */
 /* eslint-disable import/no-extraneous-dependencies */
 import memoize from 'memoizee';
-import { apiLayerCreate, createGetApi, createSetApi, overrideApi } from '../../src';
-import { NodeMockResolver } from '../../src/NodeMockResolver';
+import { createGetApi, createSetApi, overrideApi } from '../../src';
 
 // Create a global variable that will store our testing value
 let testValue = '';
 let numGetApiCalls = 0;
-
-// First we create our apiLayer for testing purposes
-const mockResolver = new NodeMockResolver();
-apiLayerCreate({ mockMode: false, mockResolver });
 
 // Now we will create our sample GET api
 function getApi(): Promise<string> {
@@ -39,11 +34,11 @@ const memoizedGet = memoize(getApi, cacheOptions);
 // Create our api-layer functions, but wrap our actual API calls with memoize
 // The memoized functions attach an additional function to our API function called clear() that is used to clear the cache.
 // If your memoization library does not add a clear() function, you will have to add it yourself manually
-const apiSampleGet = createGetApi(memoizedGet, 'mock is never called so this is ignored', {
+const apiSampleGet = createGetApi(memoizedGet, {
   cacheAge: cacheOptions.maxAge,
 });
 // Create our set api function and make sure to tell it that it will invalidate our get API if it is called using the invalidates argument
-const apiSampleSet = createSetApi(setApi, 'mock is never called so this is ignored', [apiSampleGet]);
+const apiSampleSet = createSetApi(setApi, [apiSampleGet]);
 
 test('Test our client-side API caching', async () => {
   // Call our get API call to retrieve the server value

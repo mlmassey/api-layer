@@ -1,45 +1,31 @@
-import {
-  apiLayerCreate,
-  isApiLayerFunction,
-  isApiLayer,
-  apiLayerClearOverrides,
-  apiLayerClearCache,
-  apiLayerSetOptions,
-} from './ApiLayerCommon';
-import { ApiLayer, ApiLayerOptions } from './types/ApiLayer';
+import { isApiLayerFunction } from './isApiLayerFunction';
 import { createGetApi, CreateGetApiOptions } from './createGetApi';
 import { createSetApi, CreateSetApiOptions } from './createSetApi';
-import { createMockApi } from './createMockApi';
+import { createMockFunction } from './createMockFunction';
 import { overrideApi } from './overrideApi';
 import { ApiFunction } from './types/ApiFunction';
 import { ApiType } from './types/ApiType';
 import { OverrideGroup } from './OverrideGroup';
-import { MockResolver } from './MockResolver';
 import { callApiFunction, CallApiFunctionOptions } from './callApiFunction';
-import { getMockResult, MOCK_RESULT_UNIQUE_ID, MOCK_RESULT_NAME } from './getMockResult';
+import { setMockFunction } from './setMockFunction';
+import { setApiLayerMockModeOn, SetApiLayerMockModeOptions } from './setApiLayerMockModeOn';
+import { clearApiLayerOverrides } from './clearApiLayerOverrides';
 
 export {
-  apiLayerCreate,
   createGetApi,
   isApiLayerFunction,
   overrideApi,
-  apiLayerClearCache,
-  apiLayerSetOptions,
   createSetApi,
-  createMockApi,
-  isApiLayer,
-  apiLayerClearOverrides,
+  createMockFunction,
   callApiFunction,
-  getMockResult,
-  MOCK_RESULT_NAME,
-  MOCK_RESULT_UNIQUE_ID,
+  setMockFunction,
+  setApiLayerMockModeOn,
+  clearApiLayerOverrides,
   CallApiFunctionOptions,
-  MockResolver,
   OverrideGroup,
-  ApiLayer,
-  ApiLayerOptions,
   ApiFunction,
   ApiType,
   CreateGetApiOptions,
   CreateSetApiOptions,
+  SetApiLayerMockModeOptions,
 };

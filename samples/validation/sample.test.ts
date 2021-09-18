@@ -1,12 +1,8 @@
+/* eslint-disable import/no-named-as-default */
 /* eslint-disable import/default */
 /* eslint-disable import/no-extraneous-dependencies */
 import Ajv from 'ajv';
-import { apiLayerCreate, createGetApi } from '../../src';
-import { NodeMockResolver } from '../../src/NodeMockResolver';
-
-// Create the global api layer in production mode
-const mockResolver = new NodeMockResolver();
-apiLayerCreate({ mockResolver });
+import { createGetApi } from '../../src';
 
 const ajv = new Ajv();
 
@@ -70,11 +66,8 @@ function validate(schema: any, func: () => Promise<UserData>): () => Promise<Use
 }
 
 // Now create our api function and make sure to include the validator
-const apiGetUserData = createGetApi(validate(schema, getUserData), 'mock is never called so this is ignored');
-const apiGetUserDataInvalid = createGetApi(
-  validate(schema, invalidUserData),
-  'mock is never called so this is ignored',
-);
+const apiGetUserData = createGetApi(validate(schema, getUserData));
+const apiGetUserDataInvalid = createGetApi(validate(schema, invalidUserData));
 
 test('Data validation example', async () => {
   const result = await apiGetUserData();

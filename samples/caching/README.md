@@ -1,5 +1,5 @@
 # Client-Side API caching
-The ApiLayer does not directly implement client-side caching.  The file [sample.test.ts](./sample.test.ts) demonstrates how to use the 3rd party memoization library [memoizee](https://github.com/medikoo/memoizee) to memoize your API calls to provide caching.  ApiLayer supports caching if you do the following:
+The ApiLayer does not directly implement client-side caching.  The file [sample.test.ts](./sample.test.ts) demonstrates how to use the 3rd party memoization library [memoizee](https://github.com/medikoo/memoizee) to memoize your API calls to provide caching.  api-layer supports caching if you do the following:
 
 ## Memoize your API functions
 When you write your actual API function, wrap it in memoization function.  It is recommended to have a cache age that matches how frequently your server side data changes.  
@@ -19,11 +19,11 @@ const cacheOptions = {
   maxAge: 1000 * 60 * 60,  // Set cache age to 1 hour 
 }
 
-export default createGetApi(memoize(getSampleData, cacheOptions), '/mock.result.json');
+export default createGetApi(memoize(getSampleData, cacheOptions), { cacheAge: cacheOptions.maxAge });
 ```
 
 ## Make your SET api invalidate related GET functions
-You need to tell your `SET` API function to invalidate any `GET` function that fetch the same data.  ApiLayer will take care of invalidating 
+You need to tell your `SET` API function to invalidate any `GET` function that fetch the same data.  api-layer will take care of invalidating 
 these related APIs for you when you call the `SET` function.  
 ```javascript
 import { createSetApi, apiLayerCreate } from 'api-layer';
@@ -37,7 +37,7 @@ function setSampleData(value: object): Promise<object> {
 }
 
 // Make sure to list the apiGetSampleData as a related function in your SET API
-export default createSetApi(setSampleData, '/mock.set.result.json', [apiGetSampleData]));
+export default createSetApi(setSampleData, [apiGetSampleData]));
 ```
 
 ## Using a different memoization library

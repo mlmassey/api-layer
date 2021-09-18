@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { isApiLayerFunction } from './ApiLayerCommon';
+import { isApiLayerFunction } from './isApiLayerFunction';
 import { ApiFunction } from './types/ApiFunction';
 import { overrideApi } from './overrideApi';
-import { ApiLayer } from '.';
 
 export class OverrideGroup {
   overrides: { (): void }[];
-  apiLayer?: ApiLayer;
   /**
    * Creates an Override group that manages a group of overrides
-   * @param {ApiLayer} apiLayer: (optional)  Uses this ApiLayer instead of the global layer.  Typically used for testing purposes only.
    */
-  constructor(apiLayer?: ApiLayer) {
+  constructor() {
     this.overrides = [];
-    this.apiLayer = apiLayer;
     this.add = this.add.bind(this);
     this.removeAll = this.removeAll.bind(this);
   }
@@ -39,7 +35,7 @@ export class OverrideGroup {
       throw new Error('Invalid empty overrideFunc');
     }
     // We assume this is an ApiFunction and we are adding it
-    const remove = overrideApi(apiOrHandle as ApiFunction<any, any>, overrideFunc, this.apiLayer);
+    const remove = overrideApi(apiOrHandle as ApiFunction<any, any>, overrideFunc);
     this.overrides.push(remove);
     return this;
   }

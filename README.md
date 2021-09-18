@@ -17,7 +17,7 @@ Working on many large projects, most teams are split into back-end and front-end
 # Features
 1. Abstract all your API calls with a `GET` or `SET` asynchronous function.  Your code now calls the abstracted functions instead of directly making API calls
 2. Easily update the API calls, since all of your front-end code calls the abstracted functions.  You can change/update the actual call to your back-end without changing your front-end code.
-3. The api-layer functions require a mock version be created, so all of your functions will have a test/mock version that does not need your back-end to work.  This is useful for early development or unit testing purposes.
+3. Create mock versions of your api, so all of your functions will have a test/mock version that does not need your back-end to work.  This is useful for early development or unit testing purposes.
 4. You can override your api-layer functions during run-time, allowing you to perform dependency injection at the API layer and swap out functionality as needed.  Very useful for unit testing purposes.
 5. Supports client-side API caching using any 3rd party caching/memoization library that you want to use. 
 6. Perform data validation on API responses using any 3rd party library that you want to use.  This is not directly supported in the api-layer, but sample code is provided.  

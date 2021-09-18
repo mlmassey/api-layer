@@ -7,7 +7,6 @@
 //
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const mode = process.env.NODE_ENV === 'development' ? 'development' : 'production';
 const isDev = mode === 'development';
@@ -44,19 +43,7 @@ module.exports = {
     path: path.resolve(__dirname, 'build'),
     publicPath: '/',
   },
-  plugins: [
-    new HtmlWebpackPlugin({ templateContent }),
-    /*
-     * We will use the CopyWebpackPlugin to copy all our mock files to the correct location
-     * in the webpack-dev-server so they can be found by the WebMockResolver.  This will attempt
-     * to copy all files with *.mock.* to the same folder structure as found under our ./src/api
-     * folder.
-     */
-    isDev &&
-      new CopyWebpackPlugin({
-        patterns: [{ from: '**/*.mock.*', to: 'mock', context: 'src/api' }],
-      }),
-  ].filter(Boolean),
+  plugins: [new HtmlWebpackPlugin({ templateContent })].filter(Boolean),
   devServer: {
     publicPath: '/',
     contentBase: path.resolve(__dirname, './public'),

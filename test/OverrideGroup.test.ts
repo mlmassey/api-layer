@@ -1,18 +1,14 @@
-import { OverrideGroup, apiLayerCreate, createGetApi } from '../src/index';
-
-const MOCK_RESULT = 'samples/api/mock/mockSimple.json';
-
-const apiLayer = apiLayerCreate({ mockMode: false, installGlobal: false });
+import { OverrideGroup, createGetApi } from '../src/index';
 
 function get1() {
   return Promise.resolve('get1');
 }
-const apiGet1 = createGetApi(get1, MOCK_RESULT, { apiLayer });
+const apiGet1 = createGetApi(get1);
 
 function get2() {
   return Promise.resolve('get2');
 }
-const apiGet2 = createGetApi(get2, MOCK_RESULT, { apiLayer });
+const apiGet2 = createGetApi(get2);
 
 function override1() {
   return Promise.resolve('override1');
@@ -23,7 +19,7 @@ function override2() {
 }
 
 test('Creating an override group and adding multiple overrides', async () => {
-  const overrides = new OverrideGroup(apiLayer);
+  const overrides = new OverrideGroup();
   overrides.add(apiGet1, override1).add(apiGet2, override2);
   let result: string = await apiGet1();
   expect(result).toBe('override1');
@@ -38,9 +34,9 @@ test('Creating an override group and adding multiple overrides', async () => {
 });
 
 test('Appending a group to another group', async () => {
-  const overrides1 = new OverrideGroup(apiLayer);
+  const overrides1 = new OverrideGroup();
   overrides1.add(apiGet1, override1);
-  const overrides2 = new OverrideGroup(apiLayer);
+  const overrides2 = new OverrideGroup();
   overrides2.add(apiGet2, override2);
   overrides1.add(overrides2);
   expect(overrides1.overrides.length).toBe(2);
