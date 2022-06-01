@@ -8,8 +8,8 @@
   "types": "./lib/esm/index.d.ts",
   "scripts": {
     "build": "npm run build:esm && npm run build:cjs",
-    "build:esm": "tsc -p tsconfig.json && cp package.esm.json ./lib/esm/package.json",
-    "build:cjs": "tsc -p tsconfig-cjs.json && cp package.cjs.json ./lib/cjs/package.json",
+    "build:esm": "ttsc -p tsconfig.json && cp package.esm.json ./lib/esm/package.json",
+    "build:cjs": "ttsc -p tsconfig-cjs.json && cp package.cjs.json ./lib/cjs/package.json",
     "test": "jest",
     "format": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
@@ -60,11 +60,12 @@
     ]
   },
   "devDependencies": {
-    "@types/jest": "^26.0.19",
+    "@types/jest": "^27.5.1",
     "@types/memoizee": "^0.4.4",
-    "@types/node": "^14.6.4",
+    "@types/node": "^17.0.38",
     "@typescript-eslint/eslint-plugin": "^4.10.0",
     "@typescript-eslint/parser": "^4.10.0",
+    "@zoltu/typescript-transformer-append-js-extension": "^1.0.1",
     "ajv": "^6.12.4",
     "auto-changelog": "^2.2.1",
     "eslint": "^7.11.0",
@@ -74,14 +75,15 @@
     "eslint-plugin-json": "^2.1.1",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^4.2.5",
-    "jest": "^26.6.3",
+    "jest": "^28.1.0",
     "lint-staged": "^10.1.3",
     "memoizee": "^0.4.14",
     "prettier": "^2.0.4",
-    "ts-jest": "^26.4.4",
-    "typescript": "^3.8.3",
-    "webpack": "^5.10.3",
-    "webpack-dev-server": "^3.11.0"
+    "ts-jest": "^28.0.3",
+    "ttypescript": "^1.5.13",
+    "typescript": "^4.7.2",
+    "webpack": "^5.72.1",
+    "webpack-dev-server": "^4.9.1"
   },
   "husky": {
     "hooks": {
