@@ -1,4 +1,6 @@
-import { ApiFunction, isApiLayerFunction, ApiType } from '.';
+import { isApiLayerFunction } from './isApiLayerFunction';
+import { ApiFunction } from './types/ApiFunction';
+import { ApiType } from './types/ApiType';
 
 export interface CallApiFunctionOptions {
   /** Prevents calling the installed mock function */

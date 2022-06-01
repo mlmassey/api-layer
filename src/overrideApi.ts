@@ -1,4 +1,4 @@
-import { isApiLayerFunction } from '.';
+import { isApiLayerFunction } from './isApiLayerFunction';
 import { ApiFunction } from './types/ApiFunction';
 
 /**
